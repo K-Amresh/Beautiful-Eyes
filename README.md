@@ -10,6 +10,10 @@
 
 ---
 
+### see packages/qa/src for usage example
+
+---
+
 ## How to Set Up?  
 
 1. Clone the project:
