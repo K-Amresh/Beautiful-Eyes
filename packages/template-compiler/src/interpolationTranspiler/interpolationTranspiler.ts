@@ -1,6 +1,6 @@
 // adds this. in vard in an interpolation
 
-export default function interpolationTranspiler(str:string){
+export default function interpolationTranspiler(str:string, localVars:string[] = []){
     let i=0;
 
     function skipSkippable(){
@@ -48,15 +48,16 @@ export default function interpolationTranspiler(str:string){
     }
 
     function readVar(){
-        if(!(/^[a-zA-Z_]/.test(str[0]))){
-            throw new Error(`variable name cannot start with ${str[0]}`);
+        if(!(/^[a-zA-Z_]/.test(str[i]))){
+            throw new Error(`variable name cannot start with ${str[i]}`);
         }
         let res = '';
         while(i<str.length && (/^[a-zA-Z_$.?]$/.test(str[i]))){
             res+=str[i++];
         }
-        res = `this.${res}`;
-        return res;
+        const baseName = res.split(/[.?]/)[0];
+        if(localVars.includes(baseName)) return res;
+        return `this.${res}`;
     }
 
     function readInterpolation(){

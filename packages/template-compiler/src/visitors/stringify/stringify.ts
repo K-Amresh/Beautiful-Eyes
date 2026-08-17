@@ -8,6 +8,7 @@ import { NODE_OBJ_TYPE } from "../../types/types";
 import interpolationTranspiler from "../../interpolationTranspiler/interpolationTranspiler";
 import { StringNode } from "../../nodes/string/string";
 import { Ref } from "../../nodes/ref/ref.component";
+import { For } from "../../nodes/for/for";
 
 export class Stringify extends Visitor{
 
@@ -16,7 +17,8 @@ export class Stringify extends Visitor{
     }
 
     visitInterpolation(interpolation:Interpolation ){
-        return `function(){return ${interpolationTranspiler(interpolation.content)}},`;
+        const scope = this.currentScope();
+        return `function(${scope.join(',')}){return ${interpolationTranspiler(interpolation.content, scope)}},`;
     }
 
     visitRef(ref: Ref) {
@@ -34,6 +36,9 @@ export class Stringify extends Visitor{
         str+=`ref: '${htmlElement.ref}',`;
         str+=`attributes:{`;
         htmlElement.attributes.forEach(attr=>str+=`${attr.acceptVisitor(this)}`);
+        str+='},';
+        str+=`props:{`;
+        htmlElement.props.forEach(attr=>str+=`${attr.acceptVisitor(this)}`);
         str+='},';
         str+=`eventHandlers:{`;
         htmlElement.eventHandlers.forEach(attr=>str+=`${attr.acceptVisitor(this)}`);
@@ -59,6 +64,25 @@ export class Stringify extends Visitor{
             str+=s;
         });
         str+=']';
+        return str+`},`;
+    }
+
+    visitFor(forNode:For){
+        let str = `{`;
+        str+=`type: ${NODE_OBJ_TYPE.DIRECTIVE},`;
+        str+=`name: 'for',`;
+        str+=`itemVar: '${forNode.itemVar}',`;
+        str+=`indexVar: ${forNode.indexVar ? `'${forNode.indexVar}'` : 'null'},`;
+        str+=`source: ${forNode.source.acceptVisitor(this)}`;
+        str+= forNode.keyFn ? `keyFn: ${forNode.keyFn.acceptVisitor(this)}` : `keyFn: null,`;
+
+        const scopeVars = forNode.indexVar ? [forNode.indexVar, forNode.itemVar] : [forNode.itemVar];
+        this.pushScope(scopeVars);
+        str+=`body: [`;
+        forNode.body.forEach(node=>str+=node.acceptVisitor(this));
+        str+='],';
+        this.popScope();
+
         return str+`},`;
     }
 

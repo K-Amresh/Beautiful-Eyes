@@ -4,7 +4,8 @@ import { isText } from "./util";
 export class Lexer{
     private currentPosition = 0;
     private prevToken:Token = TokenFactory.createFromType(TOKEN_TYPE.START_OF_FILE);
-    
+    private insideForHeader = false;
+
     constructor(private source:string){}
 
     public peek(position=1){
@@ -44,6 +45,9 @@ export class Lexer{
         if(this.currentPosition >= this.source.length){
             return TokenFactory.createFromType(TOKEN_TYPE.END_OF_FILE);
         }
+        if(this.insideForHeader){
+            return this.getNextForHeaderToken();
+        }
         switch(this.currentChar){
             case '<':
                 this.advance();
@@ -67,9 +71,13 @@ export class Lexer{
             //     this.advance();
             //     return this.prevToken = TokenFactory.createFromType(TOKEN_TYPE.HASH);
             case '$':
+                if([TOKEN_TYPE.ATTRIBUTE_NAME, TOKEN_TYPE.ATTRIBUTE_VALUE, TOKEN_TYPE.TAG_NAME].includes(this.prevToken.tokenType)){
+                    return this.prevToken = this.readAttributeName();
+                }
                 this.advance();
                 return this.prevToken = TokenFactory.createFromType(TOKEN_TYPE.DOLLAR);
             case '(':
+                if(this.prevToken.tokenType === TOKEN_TYPE.FOR) this.insideForHeader = true;
                 this.advance();
                 return this.prevToken = TokenFactory.createFromType(TOKEN_TYPE.PARENTHESIS_OPEN);
             case ')':
@@ -114,11 +122,11 @@ export class Lexer{
 
     private readTagName(){
         if(!this.currentChar) throw new Error(`tag name required <`);
-        if(!(/^[a-zA_Z]$/.test(this.currentChar))) throw new Error(`tag name should start from an alphabet`)
+        if(!(/^[a-zA-Z]$/.test(this.currentChar))) throw new Error(`tag name should start from an alphabet`)
         let str = this.currentChar;
         this.advance();
         while(this.currentPosition<this.source.length && ![' ', '>'].includes(this.currentChar)){
-            if(!(/^[a-zA_Z0-9_]*/.test(this.currentChar))) throw new Error(`tag name can only contain letters, digits and underscore`);
+            if(!(/^[a-zA-Z0-9_]*/.test(this.currentChar))) throw new Error(`tag name can only contain letters, digits and underscore`);
             str+=this.currentChar;
             this.advance();
         }
@@ -128,17 +136,17 @@ export class Lexer{
 
     private readAttributeName(){
         if(!this.currentChar) throw new Error(`please provide attribute or close the tag`);
-        if(['@','#'].includes(this.currentChar)){
-            if(!(/^[a-zA_Z]$/.test(this.source[this.currentPosition+1]))) 
+        if(['@','#','$'].includes(this.currentChar)){
+            if(!(/^[a-zA-Z]$/.test(this.source[this.currentPosition+1])))
                 throw new Error(`attriute name should start from an alphabet`);
         }
-        else if(!(/^[a-zA_Z]$/.test(this.currentChar))){
+        else if(!(/^[a-zA-Z]$/.test(this.currentChar))){
             throw new Error(`attriute name should start from an alphabet`);
         }
         let str = this.currentChar;
         this.advance();
         while(this.currentPosition<this.source.length && ![' ','='].includes(this.currentChar)){
-            if(!(/^[a-zA_Z0-9_]*/.test(this.currentChar))) throw new Error(`attribute name can only contain letters, digits and underscore`);
+            if(!(/^[a-zA-Z0-9_]*/.test(this.currentChar))) throw new Error(`attribute name can only contain letters, digits and underscore`);
             str+=this.currentChar;
             this.advance();
         }
@@ -173,6 +181,66 @@ export class Lexer{
         else{
             throw new Error(`expected text, got ${this.currentChar}`);
         }
+    }
+
+    private getNextForHeaderToken(): Token{
+        switch(this.currentChar){
+            case ',':
+                this.advance();
+                return this.prevToken = TokenFactory.createFromType(TOKEN_TYPE.COMMA);
+            case ':':
+                this.advance();
+                return this.prevToken = TokenFactory.createFromType(TOKEN_TYPE.COLON);
+            case ';':
+                this.advance();
+                return this.prevToken = TokenFactory.createFromType(TOKEN_TYPE.SEMICOLON);
+            case '=':
+                this.advance();
+                return this.prevToken = TokenFactory.createFromType(TOKEN_TYPE.ASSIGNMENT);
+            case ')':
+                this.advance();
+                this.insideForHeader = false;
+                return this.prevToken = TokenFactory.createFromType(TOKEN_TYPE.PARENTHESIS_CLOSE);
+            default:
+                if([TOKEN_TYPE.COLON, TOKEN_TYPE.ASSIGNMENT].includes(this.prevToken.tokenType)){
+                    return this.prevToken = TokenFactory.createFromTypeAndValue(
+                        TOKEN_TYPE.INTERPOLATION,
+                        this.readJSXInterpolationUntil(new Set([';', ')'])),
+                        true
+                    );
+                }
+                if(isText(this.currentChar)){
+                    return this.prevToken = TokenFactory.createFromTypeAndValue(TOKEN_TYPE.IDENTIFIER, this.readIdentifierName());
+                }
+                throw new Error(`unidentified token "${this.currentChar}" inside @for(...)`);
+        }
+    }
+
+    private readIdentifierName(){
+        if(!(/^[a-zA-Z_]$/.test(this.currentChar))) throw new Error(`identifier should start from a letter or underscore`);
+        let str = this.currentChar;
+        this.advance();
+        while(this.currentPosition<this.source.length && (/^[a-zA-Z0-9_]$/.test(this.currentChar))){
+            str+=this.currentChar;
+            this.advance();
+        }
+        return str;
+    }
+
+    private readJSXInterpolationUntil(delimeters:Set<string>){
+        let res = '';
+        while(this.currentPosition<this.source.length && !delimeters.has(this.currentChar)){
+            if((this.currentChar as any)==='`'){
+                res+= this.readStringInterpolation();
+            }
+            else{
+                res+=this.source[this.currentPosition++];
+            }
+        }
+        if(this.currentPosition>=this.source.length){
+            throw new Error(`unterminated @for(...) expression`);
+        }
+        return res;
     }
 
     private readString(){
@@ -249,7 +317,7 @@ export class Lexer{
         let res = '`';
         this.currentPosition++;
         while(this.currentPosition<this.source.length && this.currentChar!=='`'){
-            if(this.currentChar==='$'){
+            if(this.currentChar==='$' && this.source[this.currentPosition+1]==='{'){
                this.currentPosition++;
                res+= `\${${this.readJSXInterpolation()}}`;
             }
@@ -260,7 +328,8 @@ export class Lexer{
         if(this.currentChar!=='`'){
             throw new Error(`expected '\`' got '${TOKEN_VALUE[TOKEN_TYPE.END_OF_FILE]}'`);
         }
-        this.currentPosition++; // skipping closing `
+        res+=this.currentChar; // include closing `
+        this.currentPosition++; // skipping past closing `
         return res;
     }
 

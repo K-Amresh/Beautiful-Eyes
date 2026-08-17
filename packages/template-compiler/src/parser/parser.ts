@@ -4,6 +4,7 @@ import { ATTRIBUTE_TYPE, HtmlAttribute } from "../nodes/HtmlAttribute/HtmlAttrib
 import { HtmlChild } from "../nodes/HtmlChild/htmlChild";
 import { HtmlElement } from "../nodes/HtmlElement/HtmlElement";
 import { IfElse, IfElseConditions } from "../nodes/ifElse/ifElse";
+import { For } from "../nodes/for/for";
 import { Interpolation } from "../nodes/interpolation/interpolation";
 import { Ref } from "../nodes/ref/ref.component";
 import { StringNode } from "../nodes/string/string";
@@ -27,10 +28,14 @@ export class Parser {
     }
 
     parseAttribute() {
-        let isEventListener = false, isRef = false;
+        let isEventListener = false, isRef = false, isProp = false;
         if (this.currentToken.value.startsWith('@')) {
             this.currentToken.value
             isEventListener = true;
+            this.currentToken.value = this.currentToken.value.slice(1);
+        }
+        else if (this.currentToken.value.startsWith('$')) {
+            isProp = true;
             this.currentToken.value = this.currentToken.value.slice(1);
         }
         else if (this.currentToken.tokenType.startsWith('#')) {
@@ -44,7 +49,7 @@ export class Parser {
             return new HtmlAttribute(attributeName, new Ref(attributeName), ATTRIBUTE_TYPE.REF);
         }
         this.eat(TOKEN_TYPE.ASSIGNMENT);
-        const tagType = isEventListener ? ATTRIBUTE_TYPE.EVENT_HANDLER : ATTRIBUTE_TYPE.VALUE;
+        const tagType = isEventListener ? ATTRIBUTE_TYPE.EVENT_HANDLER : isProp ? ATTRIBUTE_TYPE.PROP : ATTRIBUTE_TYPE.VALUE;
         if (this.currentToken.isInterpolation) {
             const content = this.currentToken.value;
             this.eat(TOKEN_TYPE.ATTRIBUTE_VALUE);
@@ -63,8 +68,14 @@ export class Parser {
         this.eat(TOKEN_TYPE.TAG_NAME);
         const attributes: HtmlAttribute[] = [];
         const eventHandlers: HtmlAttribute[] = [];;
+        const props: HtmlAttribute[] = [];
         let ref: HtmlAttribute | null = null;
         while (this.currentToken.tokenType !== TOKEN_TYPE.TAG_CLOSE) {
+            if (this.currentToken.tokenType === TOKEN_TYPE.TAG_CLOSE_SLASH) {
+                this.eat(TOKEN_TYPE.TAG_CLOSE_SLASH);
+                this.eat(TOKEN_TYPE.TAG_CLOSE);
+                return new HtmlElement(tagNAme, attributes, [], eventHandlers, null, props);
+            }
             const attr = this.parseAttribute();
             if (attr.attributeType === ATTRIBUTE_TYPE.EVENT_HANDLER) {
                 eventHandlers.push(attr);
@@ -73,13 +84,11 @@ export class Parser {
                 if (ref) throw new Error('an element can contain only one ref');
                 else ref = attr;
             }
+            else if (attr.attributeType === ATTRIBUTE_TYPE.PROP) {
+                props.push(attr);
+            }
             else {
                 attributes.push(attr);
-            }
-            if (this.currentToken.tokenType === TOKEN_TYPE.TAG_CLOSE_SLASH) {
-                this.eat(TOKEN_TYPE.TAG_CLOSE_SLASH);
-                this.eat(TOKEN_TYPE.TAG_CLOSE);
-                return new HtmlElement(tagNAme, attributes, [], eventHandlers, null);
             }
         }
         this.eat(TOKEN_TYPE.TAG_CLOSE);
@@ -89,7 +98,7 @@ export class Parser {
         this.eat(TOKEN_TYPE.TAG_CLOSE_SLASH);
         this.eat(TOKEN_TYPE.TAG_NAME);
         this.eat(TOKEN_TYPE.TAG_CLOSE);
-        return new HtmlElement(tagNAme, attributes, children, eventHandlers, ref);
+        return new HtmlElement(tagNAme, attributes, children, eventHandlers, ref, props);
     }
 
     parseIfElse() {
@@ -138,9 +147,49 @@ export class Parser {
     }
 
     parseFor() {
-        //@for(let [key, val] : obj){}
-        // {key, val, interpolation} []
+        // @for(itemVar : source){}
+        // @for(indexVar, itemVar : source; key = trackFn){}
+        this.eat(TOKEN_TYPE.FOR);
+        this.eat(TOKEN_TYPE.PARENTHESIS_OPEN);
 
+        const firstVar = this.currentToken.value;
+        this.eat(TOKEN_TYPE.IDENTIFIER);
+
+        let indexVar: string | null = null;
+        let itemVar: string;
+        if ((this.currentToken.tokenType as any) === TOKEN_TYPE.COMMA) {
+            this.eat(TOKEN_TYPE.COMMA);
+            indexVar = firstVar;
+            itemVar = this.currentToken.value;
+            this.eat(TOKEN_TYPE.IDENTIFIER);
+        }
+        else {
+            itemVar = firstVar;
+        }
+
+        this.eat(TOKEN_TYPE.COLON);
+        const sourceContent = this.currentToken.value;
+        this.eat(TOKEN_TYPE.INTERPOLATION);
+        const source = new Interpolation(sourceContent);
+
+        let keyFn: Interpolation | null = null;
+        if ((this.currentToken.tokenType as any) === TOKEN_TYPE.SEMICOLON) {
+            this.eat(TOKEN_TYPE.SEMICOLON);
+            const clauseName = this.currentToken.value;
+            this.eat(TOKEN_TYPE.IDENTIFIER);
+            if (clauseName !== 'key') throw new Error(`expected 'key' got '${clauseName}'`);
+            this.eat(TOKEN_TYPE.ASSIGNMENT);
+            const keyContent = this.currentToken.value;
+            this.eat(TOKEN_TYPE.INTERPOLATION);
+            keyFn = new Interpolation(keyContent);
+        }
+
+        this.eat(TOKEN_TYPE.PARENTHESIS_CLOSE);
+        this.eat(TOKEN_TYPE.CURLEY_BRACKET_OPEN);
+        const body = this.parse(TOKEN_TYPE.CURLEY_BRACKET_CLOSE);
+        this.eat(TOKEN_TYPE.CURLEY_BRACKET_CLOSE);
+
+        return new For(itemVar, indexVar, source, keyFn, body);
     }
 
     parseSwitch() {

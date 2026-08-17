@@ -20,7 +20,9 @@ IF = @if(INTERPOLATION) STRUCTURAL_DIRECTIVE_BODY
     (@else-if(INTERPOLATION) STRUCTURAL_DIRECTIVE_BODY)*
     (@else) STRUCTURAL_DIRECTIVE_BODY
 
-FOR = @for((value | [value, index|key]) : interpolation) STRUCTURAL_DIRECTIVE_BODY
+FOR = @for((itemVar | indexVar, itemVar) : interpolation (; key = trackFnMember)?) STRUCTURAL_DIRECTIVE_BODY
+    # itemVar/indexVar are plain identifiers bound for the body (array: indexVar is the index, object: indexVar is the key)
+    # trackFnMember is a bare reference to a class method, e.g. `key = trackById`, called as trackFnMember(item, indexOrKey)
 
 SWITCH = @switch(INTERPOLATION){
     (@case(string | number)STRUCTURAL_DIRECTIVE_BODY)*

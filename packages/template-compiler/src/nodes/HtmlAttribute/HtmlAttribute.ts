@@ -9,6 +9,7 @@ export enum ATTRIBUTE_TYPE{
     VALUE,
     REF,
     EVENT_HANDLER,
+    PROP,
 }
 
 export class HtmlAttribute extends astNode{
