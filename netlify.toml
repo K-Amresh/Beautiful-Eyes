@@ -1,0 +1,6 @@
+[build]
+  command = "npm run build -w @beautiful-eyes/docs"
+  publish = "packages/docs/dist"
+
+[build.environment]
+  NODE_VERSION = "20"

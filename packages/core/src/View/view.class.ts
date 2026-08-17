@@ -80,12 +80,26 @@ export class View{
     }
 
     private addAttributes(el:HTMLElement, attributes:AttributeObj, args:any[] = []){
+        const dynamicKeys:string[] = [];
         for(let key in attributes){
-            let val = attributes[key];
-            if(typeof val === 'function') val = val.call(this.component, ...args);
-            if((el as any)[key]) (el as any)[key] = val;
-            else el.setAttribute(key, val as string);
+            const val = attributes[key];
+            if(typeof val === 'function') dynamicKeys.push(key);
+            else this.applyAttribute(el, key, val);
         }
+        if(!dynamicKeys.length) return;
+        const update = () => {
+            dynamicKeys.forEach(key=>{
+                const val = (attributes[key] as Function).call(this.component, ...args);
+                this.applyAttribute(el, key, val);
+            });
+        };
+        update();
+        this.component.reactiveElements.set(el as any, update);
+    }
+
+    private applyAttribute(el:HTMLElement, key:string, val:any){
+        if((el as any)[key]) (el as any)[key] = val;
+        else el.setAttribute(key, val as string);
     }
 
     private addEventListeners(el:HTMLElement, eventHandlers:EventHandlerObject, args:any[] = []){
@@ -259,13 +273,17 @@ export class View{
         if(!parent) return children;
         if(parent instanceof Comment){
             // add chidren only when mounted
-            parent.parentNode && children.forEach(child=>{
-                parent.after(child)
-                if(child instanceof Comment){
-                    const nodes = this.getCommentNodeProperty(child, 'nodeChild');
-                    this.appendChildrenToParent(nodes, child);
-                }
-            });
+            if(parent.parentNode){
+                let refNode:HTMLElement | Comment | Text = parent;
+                children.forEach(child=>{
+                    refNode.after(child);
+                    refNode = child;
+                    if(child instanceof Comment){
+                        const nodes = this.getCommentNodeProperty(child, 'nodeChild');
+                        this.appendChildrenToParent(nodes, child);
+                    }
+                });
+            }
         }
         else children.forEach(child=>{
             parent.appendChild(child)

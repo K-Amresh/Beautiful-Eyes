@@ -71,6 +71,11 @@ export class Parser {
         const props: HtmlAttribute[] = [];
         let ref: HtmlAttribute | null = null;
         while (this.currentToken.tokenType !== TOKEN_TYPE.TAG_CLOSE) {
+            if (this.currentToken.tokenType === TOKEN_TYPE.TAG_CLOSE_SLASH) {
+                this.eat(TOKEN_TYPE.TAG_CLOSE_SLASH);
+                this.eat(TOKEN_TYPE.TAG_CLOSE);
+                return new HtmlElement(tagNAme, attributes, [], eventHandlers, null, props);
+            }
             const attr = this.parseAttribute();
             if (attr.attributeType === ATTRIBUTE_TYPE.EVENT_HANDLER) {
                 eventHandlers.push(attr);
@@ -84,11 +89,6 @@ export class Parser {
             }
             else {
                 attributes.push(attr);
-            }
-            if (this.currentToken.tokenType === TOKEN_TYPE.TAG_CLOSE_SLASH) {
-                this.eat(TOKEN_TYPE.TAG_CLOSE_SLASH);
-                this.eat(TOKEN_TYPE.TAG_CLOSE);
-                return new HtmlElement(tagNAme, attributes, [], eventHandlers, null, props);
             }
         }
         this.eat(TOKEN_TYPE.TAG_CLOSE);

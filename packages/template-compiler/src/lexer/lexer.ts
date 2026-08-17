@@ -317,7 +317,7 @@ export class Lexer{
         let res = '`';
         this.currentPosition++;
         while(this.currentPosition<this.source.length && this.currentChar!=='`'){
-            if(this.currentChar==='$'){
+            if(this.currentChar==='$' && this.source[this.currentPosition+1]==='{'){
                this.currentPosition++;
                res+= `\${${this.readJSXInterpolation()}}`;
             }
@@ -328,7 +328,8 @@ export class Lexer{
         if(this.currentChar!=='`'){
             throw new Error(`expected '\`' got '${TOKEN_VALUE[TOKEN_TYPE.END_OF_FILE]}'`);
         }
-        this.currentPosition++; // skipping closing `
+        res+=this.currentChar; // include closing `
+        this.currentPosition++; // skipping past closing `
         return res;
     }
 

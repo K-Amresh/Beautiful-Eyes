@@ -65,6 +65,9 @@ A collection of utility libraries.
 ### `qa`  
 A package to test your framework.  
 
+### `docs`  
+The documentation site, built with the framework itself. Run locally with `npm run start:dev -w @beautiful-eyes/docs`, or build a static bundle with `npm run build -w @beautiful-eyes/docs` (output in `packages/docs/dist`). `netlify.toml` at the repo root deploys this package.
+
 ---
 
 ## Contribution  
