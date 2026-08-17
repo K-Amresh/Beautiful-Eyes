@@ -4,6 +4,7 @@ import { ATTRIBUTE_TYPE, HtmlAttribute } from "../nodes/HtmlAttribute/HtmlAttrib
 import { HtmlChild } from "../nodes/HtmlChild/htmlChild";
 import { HtmlElement } from "../nodes/HtmlElement/HtmlElement";
 import { IfElse, IfElseConditions } from "../nodes/ifElse/ifElse";
+import { For } from "../nodes/for/for";
 import { Interpolation } from "../nodes/interpolation/interpolation";
 import { Ref } from "../nodes/ref/ref.component";
 import { StringNode } from "../nodes/string/string";
@@ -138,9 +139,49 @@ export class Parser {
     }
 
     parseFor() {
-        //@for(let [key, val] : obj){}
-        // {key, val, interpolation} []
+        // @for(itemVar : source){}
+        // @for(indexVar, itemVar : source; key = trackFn){}
+        this.eat(TOKEN_TYPE.FOR);
+        this.eat(TOKEN_TYPE.PARENTHESIS_OPEN);
 
+        const firstVar = this.currentToken.value;
+        this.eat(TOKEN_TYPE.IDENTIFIER);
+
+        let indexVar: string | null = null;
+        let itemVar: string;
+        if ((this.currentToken.tokenType as any) === TOKEN_TYPE.COMMA) {
+            this.eat(TOKEN_TYPE.COMMA);
+            indexVar = firstVar;
+            itemVar = this.currentToken.value;
+            this.eat(TOKEN_TYPE.IDENTIFIER);
+        }
+        else {
+            itemVar = firstVar;
+        }
+
+        this.eat(TOKEN_TYPE.COLON);
+        const sourceContent = this.currentToken.value;
+        this.eat(TOKEN_TYPE.INTERPOLATION);
+        const source = new Interpolation(sourceContent);
+
+        let keyFn: Interpolation | null = null;
+        if ((this.currentToken.tokenType as any) === TOKEN_TYPE.SEMICOLON) {
+            this.eat(TOKEN_TYPE.SEMICOLON);
+            const clauseName = this.currentToken.value;
+            this.eat(TOKEN_TYPE.IDENTIFIER);
+            if (clauseName !== 'key') throw new Error(`expected 'key' got '${clauseName}'`);
+            this.eat(TOKEN_TYPE.ASSIGNMENT);
+            const keyContent = this.currentToken.value;
+            this.eat(TOKEN_TYPE.INTERPOLATION);
+            keyFn = new Interpolation(keyContent);
+        }
+
+        this.eat(TOKEN_TYPE.PARENTHESIS_CLOSE);
+        this.eat(TOKEN_TYPE.CURLEY_BRACKET_OPEN);
+        const body = this.parse(TOKEN_TYPE.CURLEY_BRACKET_CLOSE);
+        this.eat(TOKEN_TYPE.CURLEY_BRACKET_CLOSE);
+
+        return new For(itemVar, indexVar, source, keyFn, body);
     }
 
     parseSwitch() {

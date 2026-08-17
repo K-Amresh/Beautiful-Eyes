@@ -21,10 +21,22 @@ export type HtmlObj = {
     children:BE_Nodes
 };
 
-export type DirectiveObj = {
+export type IfElseDirective = {
     type: NODE_OBJ_TYPE.DIRECTIVE,
-    name: string,
+    name: 'ifElse',
     children:IfElse
 }
+
+export type ForDirective = {
+    type: NODE_OBJ_TYPE.DIRECTIVE,
+    name: 'for',
+    itemVar: string,
+    indexVar: string | null,
+    source: Interpolation,
+    keyFn: Interpolation | null,
+    body: BE_Nodes
+}
+
+export type DirectiveObj = IfElseDirective | ForDirective;
 
 export type DependencyFn = (ctx:any) => any[];

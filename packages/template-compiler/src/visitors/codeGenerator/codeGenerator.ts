@@ -9,6 +9,7 @@ import { NODE_OBJ_TYPE } from "../../types/types";
 import interpolationTranspiler from "../../interpolationTranspiler/interpolationTranspiler";
 import { StringNode } from "../../nodes/string/string";
 import { Ref } from "../../nodes/ref/ref.component";
+import { For } from "../../nodes/for/for";
 
 export class CodeGenerator extends Visitor{
 
@@ -50,7 +51,8 @@ export class CodeGenerator extends Visitor{
     }
 
     visitInterpolation(interpolation:Interpolation){
-        return `function(){return ${interpolationTranspiler(interpolation.content)}}`;
+        const scope = this.currentScope();
+        return `function(${scope.join(',')}){return ${interpolationTranspiler(interpolation.content, scope)}}`;
     }
 
     visitStringNode(stringNode:StringNode){
@@ -68,6 +70,26 @@ export class CodeGenerator extends Visitor{
             type:NODE_OBJ_TYPE.HTML_ELEMENT,
             directiveName:'if',
             nodes
+        };
+    }
+
+    visitFor(forNode:For){
+        const source = forNode.source.acceptVisitor(this);
+        const keyFn = forNode.keyFn ? forNode.keyFn.acceptVisitor(this) : null;
+
+        const scopeVars = forNode.indexVar ? [forNode.indexVar, forNode.itemVar] : [forNode.itemVar];
+        this.pushScope(scopeVars);
+        const body = forNode.body.map(node=>node.acceptVisitor(this));
+        this.popScope();
+
+        return {
+            type:NODE_OBJ_TYPE.DIRECTIVE,
+            name:'for',
+            itemVar: forNode.itemVar,
+            indexVar: forNode.indexVar,
+            source,
+            keyFn,
+            body,
         };
     }
 
