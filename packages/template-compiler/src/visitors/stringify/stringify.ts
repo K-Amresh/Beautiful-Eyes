@@ -37,6 +37,9 @@ export class Stringify extends Visitor{
         str+=`attributes:{`;
         htmlElement.attributes.forEach(attr=>str+=`${attr.acceptVisitor(this)}`);
         str+='},';
+        str+=`props:{`;
+        htmlElement.props.forEach(attr=>str+=`${attr.acceptVisitor(this)}`);
+        str+='},';
         str+=`eventHandlers:{`;
         htmlElement.eventHandlers.forEach(attr=>str+=`${attr.acceptVisitor(this)}`);
         str+='},';

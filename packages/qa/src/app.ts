@@ -1,8 +1,10 @@
 import {bootstrap, ReactiveClass, Component, Effect, State, Computed} from '@beautiful-eyes/core';
 import template from './app.template.be';
 import './app.styles.scss'
+import './badge.component';
 
 @Component({
+    selector: 'App',
     useTemplate:template,
     useStyleSheets:[]
 })

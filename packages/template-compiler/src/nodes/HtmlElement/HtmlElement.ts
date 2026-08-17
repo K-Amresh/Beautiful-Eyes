@@ -9,7 +9,8 @@ export class HtmlElement extends astNode{
         public attributes:HtmlAttribute[] = [],
         public children:htmlChildren = [],
         public eventHandlers:HtmlAttribute[] = [],
-        public ref:HtmlAttribute | null = null
+        public ref:HtmlAttribute | null = null,
+        public props:HtmlAttribute[] = []
     ){
         super();
     }

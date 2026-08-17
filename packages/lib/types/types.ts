@@ -14,8 +14,9 @@ export enum NODE_OBJ_TYPE {
 
 export type HtmlObj = {
     type: NODE_OBJ_TYPE.HTML_ELEMENT
-    name:string, 
+    name:string,
     attributes:AttributeObj,
+    props:AttributeObj,
     eventHandlers:EventHandlerObject,
     ref:RefObject,
     children:BE_Nodes

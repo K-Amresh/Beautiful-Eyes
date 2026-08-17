@@ -28,10 +28,14 @@ export class Parser {
     }
 
     parseAttribute() {
-        let isEventListener = false, isRef = false;
+        let isEventListener = false, isRef = false, isProp = false;
         if (this.currentToken.value.startsWith('@')) {
             this.currentToken.value
             isEventListener = true;
+            this.currentToken.value = this.currentToken.value.slice(1);
+        }
+        else if (this.currentToken.value.startsWith('$')) {
+            isProp = true;
             this.currentToken.value = this.currentToken.value.slice(1);
         }
         else if (this.currentToken.tokenType.startsWith('#')) {
@@ -45,7 +49,7 @@ export class Parser {
             return new HtmlAttribute(attributeName, new Ref(attributeName), ATTRIBUTE_TYPE.REF);
         }
         this.eat(TOKEN_TYPE.ASSIGNMENT);
-        const tagType = isEventListener ? ATTRIBUTE_TYPE.EVENT_HANDLER : ATTRIBUTE_TYPE.VALUE;
+        const tagType = isEventListener ? ATTRIBUTE_TYPE.EVENT_HANDLER : isProp ? ATTRIBUTE_TYPE.PROP : ATTRIBUTE_TYPE.VALUE;
         if (this.currentToken.isInterpolation) {
             const content = this.currentToken.value;
             this.eat(TOKEN_TYPE.ATTRIBUTE_VALUE);
@@ -64,6 +68,7 @@ export class Parser {
         this.eat(TOKEN_TYPE.TAG_NAME);
         const attributes: HtmlAttribute[] = [];
         const eventHandlers: HtmlAttribute[] = [];;
+        const props: HtmlAttribute[] = [];
         let ref: HtmlAttribute | null = null;
         while (this.currentToken.tokenType !== TOKEN_TYPE.TAG_CLOSE) {
             const attr = this.parseAttribute();
@@ -74,13 +79,16 @@ export class Parser {
                 if (ref) throw new Error('an element can contain only one ref');
                 else ref = attr;
             }
+            else if (attr.attributeType === ATTRIBUTE_TYPE.PROP) {
+                props.push(attr);
+            }
             else {
                 attributes.push(attr);
             }
             if (this.currentToken.tokenType === TOKEN_TYPE.TAG_CLOSE_SLASH) {
                 this.eat(TOKEN_TYPE.TAG_CLOSE_SLASH);
                 this.eat(TOKEN_TYPE.TAG_CLOSE);
-                return new HtmlElement(tagNAme, attributes, [], eventHandlers, null);
+                return new HtmlElement(tagNAme, attributes, [], eventHandlers, null, props);
             }
         }
         this.eat(TOKEN_TYPE.TAG_CLOSE);
@@ -90,7 +98,7 @@ export class Parser {
         this.eat(TOKEN_TYPE.TAG_CLOSE_SLASH);
         this.eat(TOKEN_TYPE.TAG_NAME);
         this.eat(TOKEN_TYPE.TAG_CLOSE);
-        return new HtmlElement(tagNAme, attributes, children, eventHandlers, ref);
+        return new HtmlElement(tagNAme, attributes, children, eventHandlers, ref, props);
     }
 
     parseIfElse() {

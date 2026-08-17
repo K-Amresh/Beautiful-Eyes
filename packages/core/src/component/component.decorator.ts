@@ -1,7 +1,9 @@
 import { BE_Node, BE_Nodes, HtmlObj } from "@beautiful-eyes/lib/types/types"
 import { View } from "../View/view.class";
+import { ComponentRegistry } from "./componentRegistry";
 
 type ComponentOptions = {
+    selector:string,
     useTemplate:BE_Nodes,
     useStyleSheets:string[]
 }
@@ -52,6 +54,11 @@ export default function Component(options:ComponentOptions){
                 this._HtmlParent = el;
             }
         }
+
+        if(ComponentRegistry.has(options.selector)){
+            throw new Error(`a component with selector "${options.selector}" is already registered`);
+        }
+        ComponentRegistry.set(options.selector, Component);
 
         return Component;
     }

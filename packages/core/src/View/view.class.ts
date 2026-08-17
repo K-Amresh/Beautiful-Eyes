@@ -1,5 +1,6 @@
 import { AttributeObj, BE_Node, BE_Nodes, DirectiveObj, EventHandlerObject, ForDirective, HtmlObj, IfElse, Interpolation, NODE_OBJ_TYPE } from "@beautiful-eyes/lib";
 import { IComponent } from "../component/component.decorator";
+import { ComponentRegistry } from "../component/componentRegistry";
 
 export class View{
 
@@ -41,6 +42,9 @@ export class View{
     }
 
     private buildHtmlElement(HtmlObj:HtmlObj, args:any[] = []){
+        const ComponentClass = ComponentRegistry.get(HtmlObj.name);
+        if(ComponentClass) return this.buildComponent(HtmlObj, ComponentClass, args);
+
         const {name:tagName, attributes, children, eventHandlers} = HtmlObj;
         let el = document.createElement(tagName);
         this.addEventListeners(el, eventHandlers, args);
@@ -50,6 +54,30 @@ export class View{
         return el;
     }
 
+    private buildComponent(htmlObj:HtmlObj, ComponentClass:new (...args:any[]) => IComponent, args:any[] = []){
+        const anchor = document.createComment('component:'+htmlObj.name);
+        const instance = new ComponentClass();
+        this.applyProps(instance, htmlObj.props, args);
+        this.applyProps(instance, htmlObj.eventHandlers, args);
+
+        const nodes = instance.view.root;
+        this.setCommentNodeProperty(anchor, 'nodeChild', nodes);
+        queueMicrotask(()=>this.appendChildrenToParent(nodes, anchor));
+
+        this.component.reactiveElements.set(anchor as any, ()=>{
+            this.applyProps(instance, htmlObj.props, args);
+            this.applyProps(instance, htmlObj.eventHandlers, args);
+        });
+        return anchor;
+    }
+
+    private applyProps(instance:any, values:AttributeObj | EventHandlerObject, args:any[]){
+        for(let key in values){
+            let val:any = (values as any)[key];
+            if(typeof val === 'function') val = val.call(this.component, ...args);
+            instance[key] = val;
+        }
+    }
 
     private addAttributes(el:HTMLElement, attributes:AttributeObj, args:any[] = []){
         for(let key in attributes){

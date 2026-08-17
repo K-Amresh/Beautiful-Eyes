@@ -71,6 +71,9 @@ export class Lexer{
             //     this.advance();
             //     return this.prevToken = TokenFactory.createFromType(TOKEN_TYPE.HASH);
             case '$':
+                if([TOKEN_TYPE.ATTRIBUTE_NAME, TOKEN_TYPE.ATTRIBUTE_VALUE, TOKEN_TYPE.TAG_NAME].includes(this.prevToken.tokenType)){
+                    return this.prevToken = this.readAttributeName();
+                }
                 this.advance();
                 return this.prevToken = TokenFactory.createFromType(TOKEN_TYPE.DOLLAR);
             case '(':
@@ -119,11 +122,11 @@ export class Lexer{
 
     private readTagName(){
         if(!this.currentChar) throw new Error(`tag name required <`);
-        if(!(/^[a-zA_Z]$/.test(this.currentChar))) throw new Error(`tag name should start from an alphabet`)
+        if(!(/^[a-zA-Z]$/.test(this.currentChar))) throw new Error(`tag name should start from an alphabet`)
         let str = this.currentChar;
         this.advance();
         while(this.currentPosition<this.source.length && ![' ', '>'].includes(this.currentChar)){
-            if(!(/^[a-zA_Z0-9_]*/.test(this.currentChar))) throw new Error(`tag name can only contain letters, digits and underscore`);
+            if(!(/^[a-zA-Z0-9_]*/.test(this.currentChar))) throw new Error(`tag name can only contain letters, digits and underscore`);
             str+=this.currentChar;
             this.advance();
         }
@@ -133,17 +136,17 @@ export class Lexer{
 
     private readAttributeName(){
         if(!this.currentChar) throw new Error(`please provide attribute or close the tag`);
-        if(['@','#'].includes(this.currentChar)){
-            if(!(/^[a-zA_Z]$/.test(this.source[this.currentPosition+1]))) 
+        if(['@','#','$'].includes(this.currentChar)){
+            if(!(/^[a-zA-Z]$/.test(this.source[this.currentPosition+1])))
                 throw new Error(`attriute name should start from an alphabet`);
         }
-        else if(!(/^[a-zA_Z]$/.test(this.currentChar))){
+        else if(!(/^[a-zA-Z]$/.test(this.currentChar))){
             throw new Error(`attriute name should start from an alphabet`);
         }
         let str = this.currentChar;
         this.advance();
         while(this.currentPosition<this.source.length && ![' ','='].includes(this.currentChar)){
-            if(!(/^[a-zA_Z0-9_]*/.test(this.currentChar))) throw new Error(`attribute name can only contain letters, digits and underscore`);
+            if(!(/^[a-zA-Z0-9_]*/.test(this.currentChar))) throw new Error(`attribute name can only contain letters, digits and underscore`);
             str+=this.currentChar;
             this.advance();
         }

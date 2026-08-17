@@ -27,6 +27,12 @@ export class CodeGenerator extends Visitor{
             attributes[attributeName] = attributeValue;
         });
 
+        const props:AttributeObj={};
+        htmlElement.props.forEach(attr=>{
+            const {attributeName, attributeValue} = attr.acceptVisitor(this);
+            props[attributeName] = attributeValue;
+        });
+
         const eventHandlers:EventHandlerObject={};
         htmlElement.eventHandlers.forEach(attr=>{
             const {attributeName, attributeValue} = attr.acceptVisitor(this);
@@ -44,6 +50,7 @@ export class CodeGenerator extends Visitor{
             type: NODE_OBJ_TYPE.HTML_ELEMENT,
             name: htmlElement.tagName,
             attributes,
+            props,
             eventHandlers,
             ref,
             children,
