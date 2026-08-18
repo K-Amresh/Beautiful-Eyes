@@ -15,6 +15,7 @@ import './sections/contributing.component';
 })
 class DocsApp extends ReactiveClass {
     @State() activeTab = 'overview';
+    @State() menuOpen = false;
 
     tabs = [
         { key: 'overview', label: 'Overview' },
@@ -27,6 +28,11 @@ class DocsApp extends ReactiveClass {
 
     setTab(key: string){
         this.activeTab = key;
+        this.menuOpen = false;
+    }
+
+    toggleMenu(){
+        this.menuOpen = !this.menuOpen;
     }
 }
 

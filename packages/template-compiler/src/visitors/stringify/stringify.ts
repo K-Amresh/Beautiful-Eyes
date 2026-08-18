@@ -13,7 +13,9 @@ import { For } from "../../nodes/for/for";
 export class Stringify extends Visitor{
 
     visitHtmlAttribute(htmlAttribute: HtmlAttribute ){
-        return `${htmlAttribute.attributeName}:${htmlAttribute.attributeValue.acceptVisitor(this)}`;
+        // quoted key: attribute names can contain characters (e.g. aria-label)
+        // that aren't valid in a bare JS object-literal key
+        return `${JSON.stringify(htmlAttribute.attributeName)}:${htmlAttribute.attributeValue.acceptVisitor(this)}`;
     }
 
     visitInterpolation(interpolation:Interpolation ){
