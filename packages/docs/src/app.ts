@@ -18,9 +18,6 @@ class DocsApp extends ReactiveClass {
     @State() activeTab = 'overview';
     @State() menuOpen = false;
 
-    // TODO: replace with the real Buy Me a Coffee URL
-    bmcUrl = 'https://www.buymeacoffee.com/';
-
     tabs = [
         { key: 'overview', label: 'Overview' },
         { key: 'reactive-class', label: 'Reactive Class' },

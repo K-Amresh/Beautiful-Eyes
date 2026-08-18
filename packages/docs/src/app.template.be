@@ -32,5 +32,5 @@
 </main>
 <footer class="site-footer">
   <span>{`Built with Beautiful Eyes -- the framework these docs describe.`}</span>
-  <a class="footer-sponsor" href={bmcUrl} target="_blank">{'☕ Sponsor'}</a>
+  <button class="footer-sponsor" @click={() => setTab('contributing')}>{'☕ Sponsor'}</button>
 </footer>

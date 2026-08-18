@@ -91,7 +91,6 @@
 <div class="sponsor-row">
   <div class="sponsor-qr">
     <img src="/upi.jpeg" alt="UPI payment QR code" />
-    <span class="demo-label">{`scan to pay via UPI`}</span>
+    <span class="sponsor-caption">{`☕ Buy me a coffee -- scan to pay via UPI`}</span>
   </div>
-  <a class="bmc-button" href={bmcUrl} target="_blank">{`☕ Buy me a coffee`}</a>
 </div>
