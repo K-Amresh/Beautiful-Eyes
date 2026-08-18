@@ -257,7 +257,7 @@ p {
   color: var(--text);
 }
 
-ul {
+ul, ol {
   color: var(--text-dim);
   padding-left: 20px;
   margin: 0 0 16px;
@@ -672,4 +672,80 @@ td code {
   font-weight: 700;
   font-size: 14px;
   color: var(--accent);
+}
+
+.example-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin: 16px 0 40px;
+}
+
+.example-code, .example-output {
+  min-width: 0;
+}
+
+.example-output {
+  display: flex;
+  flex-direction: column;
+}
+
+.example-output .demo-box {
+  margin: 0;
+  flex: 1;
+}
+
+@media (min-width: 860px) {
+  .example-grid {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+.code-viewer {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--code-bg);
+  overflow: hidden;
+}
+
+.code-viewer-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+}
+
+.code-tab {
+  appearance: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--text-dim);
+  font-family: inherit;
+  font-size: 13px;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+.code-tab:hover {
+  color: var(--text);
+}
+
+.code-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.code-viewer-body {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text);
+  padding: 16px;
+  font-size: 13px;
+  max-height: 420px;
+  overflow-y: auto;
+  overflow-x: auto;
 }

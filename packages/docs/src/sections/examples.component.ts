@@ -1,16 +1,21 @@
 import { Component, ReactiveClass } from '@beautiful-eyes/core';
 import template from './examples.template.be';
+import './code-viewer.component';
 import './demo-todo-list.component';
 import './demo-search.component';
 import './demo-accordion.component';
 
+// Adding a new example: append one entry here (id/title/description/tabs),
+// then add one matching branch to the @if/@else-if chain in
+// examples.template.be that renders <id>'s live demo tag. Everything else
+// (layout, the tabbed code viewer) is shared and needs no changes.
 @Component({
     selector: 'Examples',
     useTemplate: template,
     useStyleSheets: []
 })
 export class Examples extends ReactiveClass {
-    todoSample = `type Filter = 'all' | 'active' | 'done';
+    todoComponentSample = `type Filter = 'all' | 'active' | 'done';
 
 class TodoList extends ReactiveClass {
     @State() items = [
@@ -41,6 +46,28 @@ class TodoList extends ReactiveClass {
     }
 }`;
 
+    todoStyleSample = `.demo-todo-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.demo-todo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+}
+
+.demo-todo.done span {
+    text-decoration: line-through;
+    color: var(--text-dim);
+}`;
+
     todoTemplateSample = `<div class="buttons">
   <button @click={() => setFilter('all')}>all</button>
   <button @click={() => setFilter('active')}>active</button>
@@ -55,7 +82,7 @@ class TodoList extends ReactiveClass {
 }
 </ul>`;
 
-    searchSample = `class Search extends ReactiveClass {
+    searchComponentSample = `class Search extends ReactiveClass {
     @State() query = '';
     items = ['Proxy', 'Subscription', 'Fine-grained updates', 'Decorators'];
 
@@ -72,6 +99,21 @@ class TodoList extends ReactiveClass {
     }
 }`;
 
+    searchStyleSample = `.demo-input {
+    width: 100%;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+.demo-empty {
+    font-size: 13px;
+    color: var(--text-dim);
+    font-style: italic;
+}`;
+
     searchTemplateSample = `<input type="text" @input={onInput} />
 <ul>
 @for(item : filtered){
@@ -82,7 +124,7 @@ class TodoList extends ReactiveClass {
   <p>no matches</p>
 }`;
 
-    accordionSample = `class Accordion extends ReactiveClass {
+    accordionComponentSample = `class Accordion extends ReactiveClass {
     @State() faqs = [
         { id: 1, q: 'Is there a virtual DOM?', a: '...', open: true },
         { id: 2, q: 'How does @State track mutations?', a: '...', open: false },
@@ -96,6 +138,26 @@ class TodoList extends ReactiveClass {
     }
 }`;
 
+    accordionStyleSample = `.demo-faq {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.demo-faq-question {
+    width: 100%;
+    text-align: left;
+    background: var(--bg);
+    border: none;
+    padding: 10px 14px;
+    cursor: pointer;
+}
+
+.demo-faq-answer {
+    margin: 0;
+    padding: 0 14px 12px;
+}`;
+
     accordionTemplateSample = `@for(faq : faqs; key = trackById){
   <div class="faq">
     <button @click={() => toggle(faq.id)}>{faq.q}</button>
@@ -104,4 +166,37 @@ class TodoList extends ReactiveClass {
     }
   </div>
 }`;
+
+    examples = [
+        {
+            id: 'todo',
+            title: 'Todo list -- @State, keyed @for, a derived getter',
+            description: 'Filtering by all / active / done reads from a getter, not a plain field -- it recomputes on every access, and since it is accessed as a bare property (filteredItems, no parens) it is safe to reference directly inside @for.',
+            tabs: [
+                { key: 'component', label: 'component.ts', code: this.todoComponentSample },
+                { key: 'style', label: 'style.css', code: this.todoStyleSample },
+                { key: 'template', label: 'template.be', code: this.todoTemplateSample },
+            ],
+        },
+        {
+            id: 'search',
+            title: 'Live search -- native DOM events, @if',
+            description: '@name={expr} works for any native DOM event name, not just click -- here it listens for input to filter a list as you type.',
+            tabs: [
+                { key: 'component', label: 'component.ts', code: this.searchComponentSample },
+                { key: 'style', label: 'style.css', code: this.searchStyleSample },
+                { key: 'template', label: 'template.be', code: this.searchTemplateSample },
+            ],
+        },
+        {
+            id: 'accordion',
+            title: 'Accordion -- nested @if inside @for',
+            description: 'Each item in the list carries its own open flag, and its own @if branch -- toggling one entry does not affect the others.',
+            tabs: [
+                { key: 'component', label: 'component.ts', code: this.accordionComponentSample },
+                { key: 'style', label: 'style.css', code: this.accordionStyleSample },
+                { key: 'template', label: 'template.be', code: this.accordionTemplateSample },
+            ],
+        },
+    ];
 }
