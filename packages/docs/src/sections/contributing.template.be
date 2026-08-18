@@ -85,3 +85,13 @@
     <li>{`@if(...) and @for(... : ...) headers are scanned to the first unmatched ) or ;, with no nested-parenthesis tracking -- avoid an inline call with its own parens inside a condition.`}</li>
   </ul>
 </div>
+
+<h2>{`Sponsor`}</h2>
+<p>{`Beautiful Eyes is a solo, spare-time project. If it saved you some time, or you just like the idea of a proxy-based, subscription-driven framework with no virtual DOM, a coffee is always appreciated -- it directly funds more time spent on things like the compiler bugs fixed while building this very docs site.`}</p>
+<div class="sponsor-row">
+  <div class="sponsor-qr">
+    <img src="/upi.jpeg" alt="UPI payment QR code" />
+    <span class="demo-label">{`scan to pay via UPI`}</span>
+  </div>
+  <a class="bmc-button" href={bmcUrl} target="_blank">{`☕ Buy me a coffee`}</a>
+</div>

@@ -7,6 +7,9 @@ import template from './contributing.template.be';
     useStyleSheets: []
 })
 export class Contributing extends ReactiveClass {
+    // TODO: replace with the real Buy Me a Coffee URL
+    bmcUrl = 'https://www.buymeacoffee.com/';
+
     packages = [
         { name: 'template-compiler', body: 'Webpack loader that compiles .template.be files (lexer -> parser -> AST -> visitor) into a plain JS module.' },
         { name: 'reactiveClass', body: 'The reactivity primitives -- ReactiveClass, @State, @Effect, @Computed, @Input.' },
