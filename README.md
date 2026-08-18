@@ -59,6 +59,15 @@ This is an npm-workspaces monorepo. Each package under `packages/` has one job:
 
 Before diving in, read the **[Contributing guide](https://beautiful-eyes.netlify.app/)** (Contributing tab) in the docs site -- it walks through the project's folder structure, the compile-time template pipeline (lexer/parser/AST/visitors), and the runtime reactivity model (state → subscribers → DOM), with diagrams, plus a list of non-obvious gotchas worth knowing before you touch either.
 
+## Sponsor
+
+Beautiful Eyes is a solo, spare-time project. If it saved you some time, a coffee is always appreciated -- it directly funds more time spent on it.
+
+<p align="center">
+  <img src="packages/docs/public/upi.jpeg" alt="UPI payment QR code" width="180"><br>
+  <sub>☕ Buy me a coffee -- scan to pay via UPI</sub>
+</p>
+
 ## Inspiration
 
 This framework is inspired by:

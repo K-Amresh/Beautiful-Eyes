@@ -20,6 +20,9 @@
 @else-if(activeTab === 'templates'){
   <TemplatesDocs />
 }
+@else-if(activeTab === 'examples'){
+  <Examples />
+}
 @else-if(activeTab === 'playground'){
   <Playground />
 }
@@ -27,4 +30,7 @@
   <Contributing />
 }
 </main>
-<footer class="site-footer">{`Built with Beautiful Eyes -- the framework these docs describe.`}</footer>
+<footer class="site-footer">
+  <span>{`Built with Beautiful Eyes -- the framework these docs describe.`}</span>
+  <button class="footer-sponsor" @click={() => setTab('contributing')}>{'☕ Sponsor'}</button>
+</footer>

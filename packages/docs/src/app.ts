@@ -5,6 +5,7 @@ import './sections/overview.component';
 import './sections/reactive-class.component';
 import './sections/components.component';
 import './sections/templates.component';
+import './sections/examples.component';
 import './sections/playground.component';
 import './sections/contributing.component';
 
@@ -22,6 +23,7 @@ class DocsApp extends ReactiveClass {
         { key: 'reactive-class', label: 'Reactive Class' },
         { key: 'components', label: 'Components' },
         { key: 'templates', label: 'Templates' },
+        { key: 'examples', label: 'Examples' },
         { key: 'playground', label: 'Playground' },
         { key: 'contributing', label: 'Contributing' },
     ];
