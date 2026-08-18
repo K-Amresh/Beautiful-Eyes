@@ -695,13 +695,6 @@ td code {
   flex: 1;
 }
 
-@media (min-width: 860px) {
-  .example-grid {
-    grid-template-columns: 1fr 1fr;
-    align-items: start;
-  }
-}
-
 .code-viewer {
   border: 1px solid var(--border);
   border-radius: var(--radius);
