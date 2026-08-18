@@ -1,5 +1,5 @@
 <h1>{`Examples`}</h1>
-<p class="lede">{`Three small, complete examples -- each is a real, live component instance rendered on this page, not a screenshot. Code on the left (component / style / template), live output on the right.`}</p>
+<p class="lede">{`Three small, complete examples -- each is a real, live component instance rendered on this page, not a screenshot. Code first (component / style / template), live output below it.`}</p>
 
 @for(example : examples){
   <h2>{example.title}</h2>
