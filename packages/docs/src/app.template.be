@@ -1,6 +1,7 @@
 <header class="site-header">
   <div class="brand"><img class="brand-logo" src="/BE-Logo.png" alt="Beautiful Eyes" />Beautiful Eyes<span class="brand-dot">{'.'}</span></div>
-  <nav class="site-nav">
+  <button class="menu-toggle" @click={toggleMenu} aria-label="Toggle menu">{menuOpen ? '✕' : '☰'}</button>
+  <nav class={menuOpen ? 'site-nav open' : 'site-nav'}>
   @for(tab : tabs){
     <button class={activeTab === tab.key ? 'nav-item active' : 'nav-item'} @click={() => setTab(tab.key)}>{tab.label}</button>
   }

@@ -97,6 +97,52 @@ body {
   border-color: var(--accent);
 }
 
+.menu-toggle {
+  display: none;
+  appearance: none;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.menu-toggle:hover {
+  background: var(--bg-elevated);
+}
+
+@media (max-width: 720px) {
+  .menu-toggle {
+    display: block;
+  }
+
+  .site-nav {
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 16px 16px;
+  }
+
+  .site-nav.open {
+    display: flex;
+  }
+
+  .nav-item {
+    width: 100%;
+    text-align: left;
+  }
+}
+
 .site-main {
   flex: 1;
   width: 100%;
