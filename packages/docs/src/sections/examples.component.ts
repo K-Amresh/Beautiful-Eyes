@@ -17,6 +17,11 @@ import './demo-accordion.component';
 export class Examples extends ReactiveClass {
     todoComponentSample = `type Filter = 'all' | 'active' | 'done';
 
+@Component({
+    selector: 'TodoList',
+    useTemplate: template,
+    useStyleSheets: [style]
+})
 class TodoList extends ReactiveClass {
     @State() items = [
         { id: 1, label: 'Write docs', done: true },
@@ -82,7 +87,12 @@ class TodoList extends ReactiveClass {
 }
 </ul>`;
 
-    searchComponentSample = `class Search extends ReactiveClass {
+    searchComponentSample = `@Component({
+    selector: 'Search',
+    useTemplate: template,
+    useStyleSheets: [style]
+})
+class Search extends ReactiveClass {
     @State() query = '';
     items = ['Proxy', 'Subscription', 'Fine-grained updates', 'Decorators'];
 
@@ -124,7 +134,12 @@ class TodoList extends ReactiveClass {
   <p>no matches</p>
 }`;
 
-    accordionComponentSample = `class Accordion extends ReactiveClass {
+    accordionComponentSample = `@Component({
+    selector: 'Accordion',
+    useTemplate: template,
+    useStyleSheets: [style]
+})
+class Accordion extends ReactiveClass {
     @State() faqs = [
         { id: 1, q: 'Is there a virtual DOM?', a: '...', open: true },
         { id: 2, q: 'How does @State track mutations?', a: '...', open: false },
