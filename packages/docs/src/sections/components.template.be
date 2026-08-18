@@ -45,7 +45,15 @@
 <h2>{`Nesting`}</h2>
 <p>{`Components nest arbitrarily deep, and typically appear inside a parent's @for loop to render a list:`}</p>
 <pre>{nestingSample}</pre>
-<p>{`Each component instance owns its own isolated set of reactive bindings -- a child re-rendering does not force its parent (or siblings) to re-render, and vice versa; the only thing crossing the boundary is the prop re-application described above.`}</p>
+<p>{`Each component instance owns its own isolated set of reactive bindings -- a child re-rendering does not force its parent (or siblings) to re-render, and vice versa; the only thing crossing the boundary is the prop re-application described above. Click a chip below: each DemoChip is its own component instance with its own $count prop and an @onBump callback back up to the parent.`}</p>
+<div class="demo-box">
+  <span class="demo-label">{`live output -- click a chip`}</span>
+  <div class="demo-chips">
+  @for(chip : chips; key = trackChipById){
+    <DemoChip $label={chip.label} $count={chip.count} @onBump={() => bumpChip(chip.id)} />
+  }
+  </div>
+</div>
 
 <div class="callout">
   <span class="callout-title">{`Known limitations`}</span>

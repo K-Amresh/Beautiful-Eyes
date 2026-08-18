@@ -277,10 +277,17 @@ export class View{
                 let refNode:HTMLElement | Comment | Text = parent;
                 children.forEach(child=>{
                     refNode.after(child);
-                    refNode = child;
                     if(child instanceof Comment){
                         const nodes = this.getCommentNodeProperty(child, 'nodeChild');
                         this.appendChildrenToParent(nodes, child);
+                        // a Comment child may have just had its own nested content
+                        // spliced in right after it -- continue from the last node
+                        // of that expansion, not from the bare anchor itself
+                        const flat = this.flattenForDisplay(child);
+                        refNode = flat[flat.length - 1];
+                    }
+                    else{
+                        refNode = child;
                     }
                 });
             }

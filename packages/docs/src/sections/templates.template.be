@@ -50,6 +50,13 @@
 <h2>{`@if / @else-if / @else`}</h2>
 <pre>{ifSample}</pre>
 <p>{`The condition is a plain expression, same rules as interpolation. Branches mount / unmount their whole subtree as the condition changes.`}</p>
+<div class="demo-box">
+  <span class="demo-label">{`live output`}</span>
+  <button class="demo-btn" @click={toggleMessage}>{`toggle`}</button>
+  @if(showMessage){
+    <p class="demo-message">{`Now you see me.`}</p>
+  }
+</div>
 
 <h2>{`@for`}</h2>
 <p>{`Two forms:`}</p>
@@ -60,6 +67,18 @@
   <li>{`The optional "; key = trackFn" clause names a method on the component, called as trackFn(item, indexOrKey), used to compute a stable identity per entry so the DOM for unchanged entries is reused and just repositioned, instead of being torn down and rebuilt, when the list is reordered or spliced. Without it, the array index / object key is used as the identity.`}</li>
 </ul>
 <pre>{trackBySample}</pre>
+<div class="demo-box">
+  <span class="demo-label">{`live output`}</span>
+  <div class="demo-buttons">
+    <button class="demo-btn" @click={addItem}>{`add`}</button>
+    <button class="demo-btn" @click={removeItem}>{`remove`}</button>
+  </div>
+  <ul class="demo-list">
+  @for(item : demoItems){
+    <li>{item}</li>
+  }
+  </ul>
+</div>
 
 <div class="callout">
   <span class="callout-title">{`Known limitations / formatting quirks`}</span>
