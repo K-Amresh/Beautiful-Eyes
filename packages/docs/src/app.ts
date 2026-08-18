@@ -8,6 +8,7 @@ import './sections/templates.component';
 import './sections/examples.component';
 import './sections/playground.component';
 import './sections/contributing.component';
+import './sections/backstory.component';
 import './sections/sponsor.component';
 
 @Component({
@@ -27,6 +28,7 @@ class DocsApp extends ReactiveClass {
         { key: 'examples', label: 'Examples' },
         { key: 'playground', label: 'Playground' },
         { key: 'contributing', label: 'Contributing' },
+        { key: 'backstory', label: 'Backstory' },
         { key: 'sponsor', label: 'Sponsor' },
     ];
 

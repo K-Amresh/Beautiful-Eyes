@@ -29,6 +29,9 @@
 @else-if(activeTab === 'contributing'){
   <Contributing />
 }
+@else-if(activeTab === 'backstory'){
+  <Backstory />
+}
 @else{
   <Sponsor />
 }

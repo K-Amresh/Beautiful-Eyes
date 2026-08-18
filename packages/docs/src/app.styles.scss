@@ -742,3 +742,43 @@ td code {
   overflow-y: auto;
   overflow-x: auto;
 }
+
+.story-chapter {
+  margin: 0 0 8px;
+}
+
+.story-chapter:first-of-type .story-year {
+  margin-top: 28px;
+}
+
+.story-year {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 40px 0 0;
+}
+
+.story-chapter h2 {
+  border-top: none;
+  padding-top: 4px;
+  margin-top: 4px;
+  margin-bottom: 16px;
+}
+
+.story-chapter p {
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.story-close p {
+  color: var(--text);
+  font-style: italic;
+  margin: 0 0 12px;
+}
+
+.story-close p:last-child {
+  margin-bottom: 0;
+}
