@@ -9,10 +9,12 @@
   <li>{`Objects, arrays, Maps and Sets are wrapped in a Proxy (recursively, for nested structures), so in-place mutation also triggers a re-render.`}</li>
   <li>{`Reassigning the whole field works too, and re-proxies the new value.`}</li>
 </ul>
+<DemoCounter />
 
 <h2>{`@Effect(dependencyFn)`}</h2>
 <p>{`A method decorator that runs the method when values returned by dependencyFn(this) change. dependencyFn returns an array; the effect method is called once per array index whose value differs from the previous run, passed that index's previous value as the argument (undefined on the very first run).`}</p>
 <pre>{effectSample}</pre>
+<DemoEffectLog />
 
 <h2>{`@Computed()`}</h2>
 <p>{`A getter decorator.`}</p>
@@ -27,8 +29,8 @@
 <div class="callout">
   <span class="callout-title">{`Known limitations`}</span>
   <ul>
-    <li>{`@Effect / @Computed bookkeeping is a single static map shared by every ReactiveClass subclass, guarded by a global "instances > 1" check. In practice this means effects reliably register only for the first ReactiveClass instance constructed anywhere in the app -- and most apps now have several, once components are nested. Treat @Effect as experimental for now.`}</li>
     <li>{`@Computed() does no caching or dependency tracking -- it re-runs on every access, same as a plain getter.`}</li>
+    <li>{`An @Effect method should treat any state it writes as a plain field rather than @State (see the log field above) -- writing to an @State field from inside an effect re-enters the same reactive pass that is currently running it.`}</li>
     <li>{`There is no way to unsubscribe a binding independent of the DOM node being removed -- cleanup happens automatically when the owning @if / @for branch or component unmounts.`}</li>
   </ul>
 </div>

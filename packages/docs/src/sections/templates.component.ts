@@ -1,4 +1,4 @@
-import { Component, ReactiveClass } from '@beautiful-eyes/core';
+import { Component, ReactiveClass, State } from '@beautiful-eyes/core';
 import template from './templates.template.be';
 
 @Component({
@@ -7,6 +7,22 @@ import template from './templates.template.be';
     useStyleSheets: []
 })
 export class TemplatesDocs extends ReactiveClass {
+    @State() showMessage = false;
+
+    toggleMessage(){
+        this.showMessage = !this.showMessage;
+    }
+
+    @State() demoItems = ['Alpha', 'Bravo', 'Charlie'];
+
+    addItem(){
+        this.demoItems = [...this.demoItems, 'Item ' + (this.demoItems.length + 1)];
+    }
+
+    removeItem(){
+        this.demoItems = this.demoItems.slice(0, -1);
+    }
+
     introSample = `<!-- todo-list.template.be -->
 <h1>Todo list ({remaining} left)</h1>
 <ul>

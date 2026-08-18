@@ -14,8 +14,11 @@ type PrevValue = any;
 type EffectFnName = string;
 export class ReactiveClass implements BatchedUpdates{
 
-    static readonly effectSubscribers = new Map<DependencyFn, EffectFnName>;
-    static readonly computedSubscribers = new Map<string, Set<string>>;
+    // per-instance (not static): each instance only tracks effects/computeds
+    // declared on its own class, so unrelated ReactiveClass instances elsewhere
+    // in the app can never have their effects invoked against the wrong `this`
+    readonly effectSubscribers = new Map<DependencyFn, EffectFnName>;
+    readonly computedSubscribers = new Map<string, Set<string>>;
     otherSubscriptions:Function[] = [];
     static instances = 0;
 
@@ -28,25 +31,23 @@ export class ReactiveClass implements BatchedUpdates{
 
     // dependency: state | computed -> [effectNames]
     addEffectSubscribers(dependency:DependencyFn, context:ClassMethodDecoratorContext){
-        if(ReactiveClass.instances>1) return;
-        ReactiveClass.effectSubscribers.set(dependency, context.name as string);
+        this.effectSubscribers.set(dependency, context.name as string);
     }
 
     // dependency state | computed -> [effectNames]
     addComputedSubscribers(dependencies:string[], context:ClassGetterDecoratorContext){
-        if(ReactiveClass.instances>1) return;
         dependencies.forEach(dependency=>{
-            let subscriber = ReactiveClass.computedSubscribers.get(dependency);
+            let subscriber = this.computedSubscribers.get(dependency);
             if(!subscriber){
                 subscriber = new Set();
-                ReactiveClass.computedSubscribers.set(dependency, subscriber);
+                this.computedSubscribers.set(dependency, subscriber);
             }
             subscriber.add(context.name as string);
         });
     }
 
     runSubscribers(){
-        ReactiveClass.effectSubscribers.forEach((effectFnName, dependency)=>{
+        this.effectSubscribers.forEach((effectFnName, dependency)=>{
             const latestValue = dependency(this);
             if(this.effectDepFnPreviousValue.has(dependency)){
                 const prevValue = this.effectDepFnPreviousValue.get(dependency);

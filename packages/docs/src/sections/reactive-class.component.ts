@@ -1,5 +1,7 @@
 import { Component, ReactiveClass } from '@beautiful-eyes/core';
 import template from './reactive-class.template.be';
+import './demo-counter.component';
+import './demo-effect-log.component';
 
 @Component({
     selector: 'ReactiveClassDocs',
@@ -16,12 +18,20 @@ export class ReactiveClassDocs extends ReactiveClass {
 list.items.push({ id: 2, label: 'Ship it', done: false });
 list.items[0].done = true;`;
 
-    effectSample = `class TodoList extends ReactiveClass {
-    @State() items = [];
+    effectSample = `class Counter extends ReactiveClass {
+    @State() count = 0;
 
-    @Effect((ctx: TodoList) => [ctx.items.length])
-    onCountChange(previousLength: number | undefined){
-        console.log('item count changed from', previousLength);
+    // a plain field, not @State: this effect runs inside a reactive pass
+    // that will already refresh every binding afterward, so a plain
+    // mutation here is picked up for free
+    log: string[] = [];
+
+    @Effect((ctx: Counter) => [ctx.count])
+    onCountChange(previous: number | undefined){
+        const message = previous === undefined
+            ? \`initial count is \${this.count}\`
+            : \`count changed from \${previous} to \${this.count}\`;
+        this.log = [message, ...this.log].slice(0, 4);
     }
 }`;
 
