@@ -411,3 +411,59 @@ td code {
 .demo-chip:hover {
   border-color: var(--accent);
 }
+
+.flow {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin: 20px 0;
+}
+
+.flow-step {
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+}
+
+.flow-step h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+}
+
+.flow-step p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.flow-arrow {
+  text-align: center;
+  color: var(--accent);
+  font-size: 20px;
+  line-height: 1;
+  padding: 4px 0;
+}
+
+.flow-branch {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 0 0 20px;
+}
+
+.flow-branch-item {
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+
+.flow-branch-item h3 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.flow-branch-item p {
+  margin: 0;
+  font-size: 12px;
+}

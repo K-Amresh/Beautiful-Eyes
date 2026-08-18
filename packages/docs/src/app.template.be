@@ -19,8 +19,11 @@
 @else-if(activeTab === 'templates'){
   <TemplatesDocs />
 }
-@else{
+@else-if(activeTab === 'playground'){
   <Playground />
+}
+@else{
+  <Contributing />
 }
 </main>
 <footer class="site-footer">{`Built with Beautiful Eyes -- the framework these docs describe.`}</footer>

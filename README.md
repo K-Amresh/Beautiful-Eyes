@@ -1,90 +1,71 @@
-# Some Progress
+<p align="center">
+  <img src="packages/docs/public/Beautiful-eyes.jpg" alt="Beautiful Eyes" width="720">
+</p>
 
-## Embedded Videos  
+<h1 align="center">Beautiful Eyes</h1>
 
-### Video 1  
-[![Watch on LinkedIn](https://img.shields.io/badge/Watch%20on-LinkedIn-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/feed/update/urn:li:ugcPost:7247125492263182336/)
+<p align="center">
+  A small reactive UI framework: decorator-based state, a compact HTML-like template language,<br>
+  and a component system, compiled ahead of time into plain DOM code.
+</p>
 
-### Video 2  
-[![Watch on LinkedIn](https://img.shields.io/badge/Watch%20on-LinkedIn-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/feed/update/urn:li:ugcPost:7245498239385247745/)
-
----
-
-### see packages/qa/src for usage example
-
----
-
-## How to Set Up?  
-
-1. Clone the project:
-   ```sh
-   git clone <your-repo-url>
-   cd <your-project-directory>
-   ```
-2. Navigate to the QA package:
-   ```sh
-   cd packages/qa
-   ```
-3. Start the project:
-   ```sh
-   npm start
-   ```
+<p align="center">
+  <a href="https://beautiful-eyes.netlify.app/"><img src="https://img.shields.io/badge/docs-live%20site-7c9dff?style=for-the-badge" alt="Documentation"></a>
+  <a href="https://www.linkedin.com/feed/update/urn:li:ugcPost:7247125492263182336/"><img src="https://img.shields.io/badge/Watch%20on-LinkedIn-blue?style=for-the-badge&logo=linkedin" alt="Watch on LinkedIn"></a>
+  <a href="https://www.linkedin.com/feed/update/urn:li:ugcPost:7245498239385247745/"><img src="https://img.shields.io/badge/Watch%20on-LinkedIn-blue?style=for-the-badge&logo=linkedin" alt="Watch on LinkedIn"></a>
+</p>
 
 ---
 
-## Packages  
+## What is this?
 
-### `template-compiler`  
-A Webpack plugin that parses template files and converts them into JavaScript objects during build time.  
+- **Proxy-based state** -- `@State` wraps arrays, objects, Maps and Sets in a `Proxy`. Mutate in place and the affected bindings update, no immutable-update boilerplate.
+- **Subscription-based updates** -- every component instance keeps its own list of subscribers. A state change notifies exactly that instance's bindings, not the whole app.
+- **Fine-grained DOM updates** -- no virtual DOM, no diffing pass. Each binding (a text node, an attribute, an `@if` branch, a `@for` entry) updates itself directly when notified.
+- **Code style inspired by Angular** -- decorators on plain TypeScript classes (`@Component`, `@State`, `@Effect`, `@Input`) instead of JSX or templates-as-functions.
+- **Change detection inspired by Vue** -- reactivity through `Proxy` interception rather than compiler-injected signals (Svelte) or explicit signal primitives (Solid).
 
-### `dynamic-import`  
-A TypeScript plugin that converts static imports into dynamic imports.  
-Example:  
-```ts
-import './someFile';
-```
-will be transformed into  
-```ts
-import('./someFile');
+**📖 Full documentation, live examples, and an in-browser playground: [beautiful-eyes.netlify.app](https://beautiful-eyes.netlify.app/)**
+
+## Quick start
+
+```sh
+git clone <this-repo-url>
+cd Beautiful-Eyes
+npm install
+npm run start:qa      # a small example app
+npm run start:docs    # the documentation site, built with the framework itself
 ```
 
-### `reactiveClass`  
-A class-based reactive system using `Proxy` and `Object.defineProperty`, allowing you to execute code when a property changes.  
+See [`packages/qa/src`](packages/qa/src) for a minimal usage example.
 
-### `core`  
-Provides essential decorators and utilities, including:  
-- `@Component`  
-- `@State`  
-- `@Effect`  
-- `@Computed`  
-- Functions like `bootstrap()`  
+## Project structure
 
-### `lib`  
-A collection of utility libraries.  
+This is an npm-workspaces monorepo. Each package under `packages/` has one job:
 
-### `qa`  
-A package to test your framework.  
+| package | what it does |
+|---|---|
+| [`template-compiler`](packages/template-compiler) | Webpack loader that compiles `.template.be` files (lexer → parser → AST → visitor) into a plain JS module. |
+| [`reactiveClass`](packages/reactiveClass) | The reactivity primitives: `ReactiveClass`, `@State`, `@Effect`, `@Computed`, `@Input`. |
+| [`core`](packages/core) | Turns a compiled template into real DOM, wires up reactivity, and implements the component system (`@Component`, props, nesting, `bootstrap()`). |
+| [`lib`](packages/lib) | Shared utilities used across packages -- the `Proxy` machinery, shared types, a task queue. |
+| [`dynamic-import`](packages/dynamic-import) | A TypeScript transformer that rewrites static imports (`import './x'`) into dynamic ones (`import('./x')`). |
+| [`qa`](packages/qa) | A small example app used to exercise the framework end-to-end. |
+| [`docs`](packages/docs) | The documentation site -- itself a Beautiful Eyes app. Deployed via the `netlify.toml` at the repo root. |
 
-### `docs`  
-The documentation site, built with the framework itself. Run locally with `npm run start:dev -w @beautiful-eyes/docs`, or build a static bundle with `npm run build -w @beautiful-eyes/docs` (output in `packages/docs/dist`). `netlify.toml` at the repo root deploys this package.
+## Contributing
 
----
+🚧 **Work in progress** 🚧 -- issues and pull requests are welcome.
 
-## Contribution  
+Before diving in, read the **[Contributing guide](https://beautiful-eyes.netlify.app/)** (Contributing tab) in the docs site -- it walks through the project's folder structure, the compile-time template pipeline (lexer/parser/AST/visitors), and the runtime reactivity model (state → subscribers → DOM), with diagrams, plus a list of non-obvious gotchas worth knowing before you touch either.
 
-🚧 **Work is still in progress** 🚧  
-Feel free to open a **Pull Request** if you want to contribute!  
+## Inspiration
 
----
-
-## Inspiration  
-
-This framework is inspired by:  
-- **Vue.js** - State handling strategy using Proxies  
-- **Svelte.js** - Architecture that ditches the Virtual DOM  
-- **Solid.js** - Fine-grained component updates for better performance  
+This framework is inspired by:
+- **Vue.js** -- state handling strategy using Proxies
+- **Svelte.js** -- architecture that ditches the virtual DOM
+- **Solid.js** -- fine-grained component updates for better performance
 
 ---
 
-🚀 **Stay tuned for updates!**
-
+<p align="center">🚀 Stay tuned for updates!</p>
