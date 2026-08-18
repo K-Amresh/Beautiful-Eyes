@@ -6,6 +6,7 @@ import './sections/reactive-class.component';
 import './sections/components.component';
 import './sections/templates.component';
 import './sections/playground.component';
+import './sections/contributing.component';
 
 @Component({
     selector: 'DocsApp',
@@ -21,6 +22,7 @@ class DocsApp extends ReactiveClass {
         { key: 'components', label: 'Components' },
         { key: 'templates', label: 'Templates' },
         { key: 'playground', label: 'Playground' },
+        { key: 'contributing', label: 'Contributing' },
     ];
 
     setTab(key: string){
