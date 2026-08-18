@@ -210,6 +210,11 @@ export class View{
             });
 
             keyedEntries = nextKeyedEntries;
+            // keep the anchor's own nodeChild in sync so anything that treats
+            // this Comment generically (appendChildrenToParent, unMountNode)
+            // -- e.g. a @for used directly at a component's top level, with no
+            // wrapping element -- knows what is actually mounted under it
+            this.setCommentNodeProperty(anchor, 'nodeChild', orderedComments);
 
             queueMicrotask(()=>{
                 if(!anchor.parentNode) return;

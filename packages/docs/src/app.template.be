@@ -26,11 +26,14 @@
 @else-if(activeTab === 'playground'){
   <Playground />
 }
-@else{
+@else-if(activeTab === 'contributing'){
   <Contributing />
+}
+@else{
+  <Sponsor />
 }
 </main>
 <footer class="site-footer">
   <span>{`Built with Beautiful Eyes -- the framework these docs describe.`}</span>
-  <button class="footer-sponsor" @click={() => setTab('contributing')}>{'☕ Sponsor'}</button>
+  <button class="footer-sponsor" @click={() => setTab('sponsor')}>{'☕ Sponsor'}</button>
 </footer>

@@ -8,6 +8,7 @@ import './sections/templates.component';
 import './sections/examples.component';
 import './sections/playground.component';
 import './sections/contributing.component';
+import './sections/sponsor.component';
 
 @Component({
     selector: 'DocsApp',
@@ -26,6 +27,7 @@ class DocsApp extends ReactiveClass {
         { key: 'examples', label: 'Examples' },
         { key: 'playground', label: 'Playground' },
         { key: 'contributing', label: 'Contributing' },
+        { key: 'sponsor', label: 'Sponsor' },
     ];
 
     setTab(key: string){
