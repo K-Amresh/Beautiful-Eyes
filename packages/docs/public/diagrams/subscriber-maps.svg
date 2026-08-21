@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" role="img" aria-labelledby="title desc">
+  <title id="title">ReactiveClass subscriber maps on one instance</title>
+  <desc id="desc">@Effect, @Computed, and @Component init each write a different collection on the instance. runSubscribers reads them all.</desc>
+  <rect width="760" height="420" fill="#0f1115"/>
+  <text x="380" y="28" text-anchor="middle" fill="#7c9dff" font-family="system-ui, sans-serif" font-size="13" font-weight="700">one ReactiveClass instance</text>
+
+  <!-- writers -->
+  <rect x="24" y="48" width="220" height="52" rx="8" fill="#161922" stroke="#262b38"/>
+  <text x="134" y="70" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="13" font-weight="700">@Effect(depFn)</text>
+  <text x="134" y="88" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">addEffectSubscribers</text>
+
+  <rect x="270" y="48" width="220" height="52" rx="8" fill="#161922" stroke="#262b38"/>
+  <text x="380" y="70" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="13" font-weight="700">@Computed</text>
+  <text x="380" y="88" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">addComputedSubscribers</text>
+
+  <rect x="516" y="48" width="220" height="52" rx="8" fill="#161922" stroke="#262b38"/>
+  <text x="626" y="70" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="13" font-weight="700">@Component init()</text>
+  <text x="626" y="88" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">addOtherSubscription</text>
+
+  <line x1="134" y1="100" x2="134" y2="132" stroke="#7c9dff" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="380" y1="100" x2="380" y2="132" stroke="#7c9dff" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="626" y1="100" x2="626" y2="132" stroke="#7c9dff" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- maps -->
+  <rect x="24" y="140" width="220" height="132" rx="8" fill="#161922" stroke="#7c9dff"/>
+  <text x="134" y="164" text-anchor="middle" fill="#7c9dff" font-family="SF Mono, Menlo, monospace" font-size="11">effectSubscribers</text>
+  <text x="134" y="184" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">Map&lt;depFn, methodName&gt;</text>
+  <text x="134" y="214" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="12">ctx =&gt; [ctx.count]</text>
+  <text x="134" y="234" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">maps to</text>
+  <text x="134" y="254" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="12">"logCount"</text>
+
+  <rect x="270" y="140" width="220" height="132" rx="8" fill="#161922" stroke="#262b38" stroke-dasharray="4 3"/>
+  <text x="380" y="164" text-anchor="middle" fill="#7c9dff" font-family="SF Mono, Menlo, monospace" font-size="11">computedSubscribers</text>
+  <text x="380" y="184" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">Map&lt;name, Set&lt;name&gt;&gt;</text>
+  <text x="380" y="220" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="12">reserved / unused</text>
+  <text x="380" y="240" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">@Computed is a passthrough</text>
+
+  <rect x="516" y="140" width="220" height="132" rx="8" fill="#161922" stroke="#7c9dff"/>
+  <text x="626" y="164" text-anchor="middle" fill="#7c9dff" font-family="SF Mono, Menlo, monospace" font-size="11">otherSubscriptions</text>
+  <text x="626" y="184" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">Function[]</text>
+  <text x="626" y="220" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="12">walk reactiveElements</text>
+  <text x="626" y="240" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">one fn per component</text>
+
+  <line x1="134" y1="272" x2="134" y2="304" stroke="#7c9dff" stroke-width="1.5"/>
+  <line x1="380" y1="272" x2="380" y2="304" stroke="#262b38" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <line x1="626" y1="272" x2="626" y2="304" stroke="#7c9dff" stroke-width="1.5"/>
+  <line x1="134" y1="304" x2="626" y2="304" stroke="#7c9dff" stroke-width="1.5"/>
+  <line x1="380" y1="304" x2="380" y2="328" stroke="#7c9dff" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="220" y="336" width="320" height="56" rx="8" fill="#2a3358" stroke="#7c9dff"/>
+  <text x="380" y="360" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="14" font-weight="700">runSubscribers()</text>
+  <text x="380" y="378" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">effects first, then otherSubscriptions</text>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7c9dff"/>
+    </marker>
+  </defs>
+</svg>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 460" role="img" aria-labelledby="title desc">
+  <title id="title">@for keyed reconcile</title>
+  <desc id="desc">Each render walks the source into keyed entries. Same key, item reference, and index reuses the row. Otherwise the row is rebuilt. Missing keys unmount.</desc>
+  <rect width="760" height="460" fill="#0f1115"/>
+  <text x="380" y="28" text-anchor="middle" fill="#7c9dff" font-family="system-ui, sans-serif" font-size="13" font-weight="700">@for(item : items; key = trackById)</text>
+
+  <rect x="40" y="48" width="200" height="88" rx="8" fill="#161922" stroke="#262b38"/>
+  <text x="140" y="76" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="13" font-weight="700">source</text>
+  <text x="140" y="98" text-anchor="middle" fill="#9aa1b2" font-family="SF Mono, Menlo, monospace" font-size="11">array -> [index, item]</text>
+  <text x="140" y="116" text-anchor="middle" fill="#9aa1b2" font-family="SF Mono, Menlo, monospace" font-size="11">object -> [key, value]</text>
+
+  <polygon points="252,92 276,80 276,104" fill="#7c9dff"/>
+
+  <rect x="284" y="48" width="192" height="88" rx="8" fill="#161922" stroke="#7c9dff"/>
+  <text x="380" y="76" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="13" font-weight="700">key</text>
+  <text x="380" y="98" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">trackById(item, index)</text>
+  <text x="380" y="116" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">or index if no keyFn</text>
+
+  <polygon points="488,92 512,80 512,104" fill="#7c9dff"/>
+
+  <rect x="520" y="48" width="200" height="88" rx="8" fill="#161922" stroke="#262b38"/>
+  <text x="620" y="76" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="13" font-weight="700">Map&lt;key, row&gt;</text>
+  <text x="620" y="98" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">comment + item + index</text>
+  <text x="620" y="116" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">duplicate key throws</text>
+
+  <line x1="380" y1="136" x2="380" y2="168" stroke="#7c9dff" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <text x="380" y="188" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="13" font-weight="700">per entry, compared to last render</text>
+
+  <rect x="24" y="208" width="228" height="88" rx="8" fill="#161922" stroke="#7c9dff"/>
+  <text x="138" y="240" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="13" font-weight="700">reuse</text>
+  <text x="138" y="262" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">same key AND</text>
+  <text x="138" y="280" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">same item ref AND index</text>
+
+  <rect x="266" y="208" width="228" height="88" rx="8" fill="#161922" stroke="#262b38"/>
+  <text x="380" y="240" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="13" font-weight="700">rebuild</text>
+  <text x="380" y="262" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">same key, item or</text>
+  <text x="380" y="280" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">index changed -> unmount + mount</text>
+
+  <rect x="508" y="208" width="228" height="88" rx="8" fill="#161922" stroke="#262b38"/>
+  <text x="622" y="240" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="13" font-weight="700">unmount</text>
+  <text x="622" y="262" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">key gone from source</text>
+  <text x="622" y="280" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">drop DOM + bindings</text>
+
+  <line x1="138" y1="296" x2="138" y2="328" stroke="#7c9dff" stroke-width="1.5"/>
+  <line x1="380" y1="296" x2="380" y2="328" stroke="#7c9dff" stroke-width="1.5"/>
+  <line x1="622" y1="296" x2="622" y2="328" stroke="#7c9dff" stroke-width="1.5"/>
+  <line x1="138" y1="328" x2="622" y2="328" stroke="#7c9dff" stroke-width="1.5"/>
+  <line x1="380" y1="328" x2="380" y2="352" stroke="#7c9dff" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="80" y="356" width="600" height="80" rx="8" fill="#2a3358" stroke="#7c9dff"/>
+  <text x="380" y="388" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="13" font-weight="700">&lt;!--for--&gt;  then per-row  &lt;!--for-item--&gt;</text>
+  <text x="380" y="412" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="12">microtask repositions flattened comment+body trees to match source order</text>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7c9dff"/>
+    </marker>
+  </defs>
+</svg>

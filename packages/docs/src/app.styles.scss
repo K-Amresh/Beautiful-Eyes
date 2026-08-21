@@ -345,6 +345,82 @@ td code {
   margin-bottom: 8px;
 }
 
+.toc-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 8px;
+}
+
+.toc {
+  list-style: none;
+  padding: 16px 20px;
+  margin: 0 0 28px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  border-radius: var(--radius);
+}
+
+.toc li {
+  margin: 0;
+}
+
+.toc a {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 14px;
+  display: block;
+  padding: 4px 0;
+}
+
+.toc a:hover {
+  text-decoration: underline;
+}
+
+.diagram-wrap {
+  margin: 0 0 24px;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  border-radius: var(--radius);
+}
+
+.diagram {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-width: 560px;
+}
+
+.two-col-pre {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 0 0 20px;
+}
+
+.two-col-pre pre {
+  margin: 0;
+}
+
+.two-col-pre .pre-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 6px;
+}
+
+@media (max-width: 720px) {
+  .two-col-pre {
+    grid-template-columns: 1fr;
+  }
+}
+
 .playground-form {
   margin: 0 0 32px;
 }
@@ -622,7 +698,7 @@ td code {
 
 .flow-branch {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 10px;
   margin: 0 0 20px;
 }
@@ -700,6 +776,7 @@ td code {
   border-radius: var(--radius);
   background: var(--code-bg);
   overflow: hidden;
+  margin: 0 0 20px;
 }
 
 .code-viewer-tabs {

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 500" role="img" aria-labelledby="title desc">
+  <title id="title">Parent notify re-applies $props onto the child @Input setter</title>
+  <desc id="desc">Each instance has its own runSubscribers. The only cross-instance hop is applyProps writing the child Input field, which may then notify the child.</desc>
+  <rect width="760" height="500" fill="#0f1115"/>
+  <text x="380" y="26" text-anchor="middle" fill="#7c9dff" font-family="system-ui, sans-serif" font-size="13" font-weight="700">two instances, two Maps - props are the only bridge</text>
+
+  <rect x="24" y="44" width="348" height="200" rx="8" fill="#161922" stroke="#7c9dff"/>
+  <text x="198" y="72" text-anchor="middle" fill="#7c9dff" font-family="system-ui, sans-serif" font-size="13" font-weight="700">PARENT</text>
+  <text x="198" y="96" text-anchor="middle" fill="#e7e9ee" font-family="SF Mono, Menlo, monospace" font-size="12">@State() name = 'Ada'</text>
+  <text x="198" y="122" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">this.name = 'Bo'</text>
+  <text x="198" y="148" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="12">runSubscribers()</text>
+  <text x="198" y="172" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">otherSubscriptions walks</text>
+  <text x="198" y="192" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">parent.reactiveElements</text>
+  <text x="198" y="220" text-anchor="middle" fill="#e7e9ee" font-family="SF Mono, Menlo, monospace" font-size="11">Comment -&gt; applyProps(child)</text>
+
+  <rect x="388" y="44" width="348" height="200" rx="8" fill="#161922" stroke="#262b38"/>
+  <text x="562" y="72" text-anchor="middle" fill="#7c9dff" font-family="system-ui, sans-serif" font-size="13" font-weight="700">CHILD</text>
+  <text x="562" y="96" text-anchor="middle" fill="#e7e9ee" font-family="SF Mono, Menlo, monospace" font-size="12">@Input() label = ''</text>
+  <text x="562" y="122" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">own reactiveElements</text>
+  <text x="562" y="148" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">own otherSubscriptions</text>
+  <text x="562" y="180" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="12">does not see parent.count++</text>
+  <text x="562" y="200" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">until a $prop assignment lands</text>
+
+  <polygon points="372,144 400,132 400,156" fill="#7c9dff"/>
+
+  <rect x="80" y="268" width="600" height="88" rx="8" fill="#2a3358" stroke="#7c9dff"/>
+  <text x="380" y="296" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="13" font-weight="700">applyProps: child.label = parent.$label expr</text>
+  <text x="380" y="318" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="12">@Input setter: if (value === val) return  // same primitive / same object</text>
+  <text x="380" y="338" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="12">else value = val; child.runSubscribers()</text>
+
+  <rect x="80" y="376" width="600" height="100" rx="8" fill="#161922" stroke="#262b38"/>
+  <text x="380" y="404" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="13" font-weight="700">then the child tick is ordinary</text>
+  <text x="380" y="426" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="12">child otherSubscriptions -&gt; child Text {label} -&gt; 'Bo'</text>
+  <text x="380" y="448" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="12">parent interpolations do not run on the child, and vice versa</text>
+</svg>
