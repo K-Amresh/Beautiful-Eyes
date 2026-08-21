@@ -7,7 +7,7 @@
   }
   </nav>
 </header>
-<main class="site-main">
+<main class={activeTab === 'contributing' ? 'site-main wide' : 'site-main'}>
 @if(activeTab === 'overview'){
   <Overview />
 }
