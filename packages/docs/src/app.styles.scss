@@ -257,6 +257,29 @@ p {
   color: var(--text);
 }
 
+.overview-links {
+  margin: 0 0 28px;
+}
+
+.repo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  padding: 8px 14px;
+  border-radius: var(--radius);
+}
+
+.repo-link:hover {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
 ul, ol {
   color: var(--text-dim);
   padding-left: 20px;
