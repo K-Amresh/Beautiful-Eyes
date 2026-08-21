@@ -1,5 +1,33 @@
 <h1>{`Contributing`}</h1>
-<p class="lede">{`This page is for anyone about to touch the framework's own code -- not just use it. It walks a value from a class field through Proxy / accessors, through the compiled template, through View bindings, and into the DOM. Dummy examples match the real emit shape (NODE_OBJ_TYPE.HTML_ELEMENT is 0, DIRECTIVE is 1).`}</p>
+<p class="lede">{`This page is for anyone about to touch the framework's own code -- not just use it. It walks a value from a class field through Proxy / accessors, through the compiled template, through View bindings, and into the DOM.`}</p>
+
+<h2 id="how-to-read">{`How to read this page`}</h2>
+<p>{`Follow the sections in order, or jump from the list below. Each block is meant to build one picture: a write on this instance, a compiled template function, a Map of updaters, then @if / @for stamps.`}</p>
+<div class="callout">
+  <span class="callout-title">{`Code examples are for explanation`}</span>
+  <ul>
+    <li>{`Tabbed snippets (template.be, emitted JS, runtime, after mount) are teaching models. They are pretty-printed, named for the dummy in that section, and often omit fields or collapse helpers. Real source in packages/ may differ -- line breaks, variable names, extra properties, and control flow.`}</li>
+    <li>{`Emit shapes are real (NODE_OBJ_TYPE.HTML_ELEMENT is 0, DIRECTIVE is 1; interpolations are functions; @else is null). Do not paste a runtime tab into the compiler and expect it to compile.`}</li>
+    <li>{`When you change the framework, trust the files in Where to look over anything on this page.`}</li>
+  </ul>
+</div>
+<p>{`A few surfaces exist in the grammar or as empty methods but are not implemented yet. Treat them as open work, not as documented behavior:`}</p>
+<table>
+  <thead>
+    <tr>
+      <th>{`feature`}</th>
+      <th>{`status`}</th>
+    </tr>
+  </thead>
+  <tbody>
+  @for(item : pendingItems){
+    <tr>
+      <td><code>{item.name}</code></td>
+      <td>{item.body}</td>
+    </tr>
+  }
+  </tbody>
+</table>
 
 <p class="toc-label">{`On this page`}</p>
 <ul class="toc">
@@ -57,6 +85,7 @@
 </table>
 <p>{`Right after new Counter(), before any @Component wrapper exists, those maps look like this:`}</p>
 <pre>{dummyMapsSample}</pre>
+<p>{`@Computed() is a passthrough getter today -- no cache, no dependency list. computedSubscribers and addComputedSubscribers are reserved; wiring them is pending. Do not treat that map as live behavior.`}</p>
 
 <h3>{`@State is two shapes`}</h3>
 <p>{`The field decorator in state.decorator.ts always installs a getter/setter. What the getter returns depends on the initial value:`}</p>
@@ -205,23 +234,43 @@
 <p>{`Child-owned @State is the other direction. this.local++ on the child ticks only the child. The parent Map is untouched. Callbacks (@onPing) are how the child asks the parent to change parent state.`}</p>
 
 <h2 id="ifelse">{`@if / @else-if / @else -- compile, emit, runtime`}</h2>
-<p>{`parseIfElse walks @if, then zero or more @else-if, then an optional @else. Each branch is [Interpolation, bodyNodes]. @else stores null instead of an interpolation. A lone @else-if or @else throws.`}</p>
+<p>{`parseIfElse walks @if, then zero or more @else-if, then an optional @else. Each branch is [Interpolation, bodyNodes]. @else stores null instead of an interpolation -- it always matches if nothing above did. A lone @else-if or @else throws.`}</p>
+<p>{`The emitted children array is a list of branch stamps, not mounted DOM. Runtime evaluates the conditions in order and calls buildNodeTree on exactly one stamp -- or none, if every condition is false and there is no @else. The <!--if--> comment is the placeholder that stays in the parent; the winning body is inserted after it.`}</p>
 <CodeViewer $tabs={ifExampleTabs} />
 <div class="diagram-wrap">
   <img class="diagram" src="/diagrams/ifelse-emit.svg" alt="If-else source compiled to an array of condition and body pairs, then one mounted branch"/>
 </div>
-<p>{`Runtime (addIfElseDirective): insert a comment if, evaluate conditions in order with interpolation.call(component), mount the first truthy body (null always wins). The comment is the reactiveElements key. On notify, if the winning index is unchanged, return. If it changed, unMountNode the current subtree (which also deletes nested Map entries) and mount the new body. Branches are created and destroyed, not shown and hidden. See the runtime tab above.`}</p>
-<p>{`The lexer reads @if(...) up to the first unmatched closing paren, with no nested-paren tracking. Prefer a comparison or a getter over an inline call with its own parentheses.`}</p>
+<p>{`First paint and later ticks share paint() (see the runtime tab). lastIndex remembers which branch is live:`}</p>
+<ul>
+  <li>{`Same winning index -- paint returns immediately. The branch DOM is not rebuilt. Interpolations inside that branch still update, because they registered their own reactiveElements entries on this same component when the branch was mounted.`}</li>
+  <li>{`Different index -- unMountNode the current subtree (DOM remove + Map delete for every nested Text / attr / inner @if / @for), then buildNodeTree the new stamp, then insert the new nodes after <!--if-->. The old <span>even</span> is gone; a brand-new <span>odd</span> is created.`}</li>
+  <li>{`No match and no @else -- unmount, nodes = [], lastIndex = -1. The comment remains; the parent has a hole until a condition becomes true again.`}</li>
+</ul>
+<p>{`Branches are created and destroyed, not shown and hidden with CSS. Open when count changes for a count=2 / 4 / 3 / 1 walkthrough. The lexer reads @if(...) up to the first unmatched closing paren, with no nested-paren tracking -- prefer a comparison or a getter over an inline call with its own parentheses.`}</p>
 
 <h2 id="for">{`@for -- compile, emit, runtime`}</h2>
 <p>{`Two headers: @for(item : source) or @for(index, item : source; key = trackById). The names before the colon are pushed onto the visitor scope stack, so interpolations inside the body become function(index, item){...} and those identifiers are not prefixed with this. Nested @for stacks: an inner loop still sees the outer item. After the colon is the collection expression. The optional key = trackById is a bare method name on the component, compiled as function(){ return this.trackById } -- the runtime later calls that method as trackById(item, indexOrKey).`}</p>
+<p>{`body in the emitted JS is a stamp for one row, not the rendered list. The compiler does not know how long items will be. If the template has one <li>, body is an array of length 1 -- that <li> descriptor. At runtime, addForDirective calls buildNodeTree(body, [index, item]) once per array entry. Three items produce three separate <li> nodes, each with its own Text and its own reactiveElements entries.`}</p>
 <CodeViewer $tabs={forExampleTabs} />
-<p>{`resolveForEntries: an array becomes [index, item] pairs. A plain object becomes Object.keys pairs. Anything else throws. Each row is built as buildNodeTree(body, [...parentArgs, indexOrKey, item]) so nested interpolations receive the loop variables as arguments.`}</p>
+<p>{`First paint (see runtime and when the array changes):`}</p>
+<ul>
+  <li>{`Insert one <!--for--> comment in the parent. That comment is the Map key for the whole loop.`}</li>
+  <li>{`source() is the current array. resolveForEntries turns it into [index, item] pairs (or Object.keys pairs for a plain object).`}</li>
+  <li>{`For each pair, compute a key (trackById(item, index), or the index itself). Stamp body with buildNodeTree(body, [index, item]). Wrap those nodes in a <!--for-item--> comment. Store {comment, item, index} in a Map keyed by that key.`}</li>
+  <li>{`A microtask walks the ordered for-item comments and after()-inserts each flattened row after <!--for-->, so DOM order matches the array.`}</li>
+</ul>
+<p>{`Every later tick re-runs the same render() against the current array. That is how a dynamic-length list grows and shrinks -- there is no separate "add row" API:`}</p>
+<ul>
+  <li>{`Key already in the Map, same item reference, same index -- reuse. The existing <li> and its interpolations stay. Those interpolations still refresh because they live in reactiveElements.`}</li>
+  <li>{`New key (push, or a newly inserted object) -- stamp a new for-item with buildNodeTree. That is how more elements are added.`}</li>
+  <li>{`Key gone (pop, filter, splice out) -- unMountNode that for-item. The <li> is removed from the DOM and its Text / inner directives are deleted from reactiveElements. That is how excess elements are deleted.`}</li>
+  <li>{`Same key but item reference or index changed -- destroy the old row and stamp a new one. A splice that shifts later indexes remounts those rows even with key = trackById, because reuse requires index to match too.`}</li>
+  <li>{`Duplicate key -- throw.`}</li>
+</ul>
+<p>{`Open when the array changes for a two-item list that is pushed, popped, spliced, and mutated in place. resolveForEntries: an array becomes [index, item] pairs; a plain object becomes Object.keys pairs; anything else throws.`}</p>
 <div class="diagram-wrap">
   <img class="diagram" src="/diagrams/for-reconcile.svg" alt="For reconcile: source to key to reuse, rebuild, or unmount, then DOM order"/>
 </div>
-<p>{`addForDirective keeps a Map from key to {comment, item, indexOrKey}. Duplicate keys throw. Reuse is stricter than a typical keyed list -- see the runtime tab above.`}</p>
-<p>{`Each row owns a comment for-item whose nodeChild is that iteration's nodes. Unmount walks those comments, removes the DOM, and deletes their bindings. A microtask then walks the ordered comments and after()-inserts the flattened trees so DOM order matches the source, including nested directive comments.`}</p>
 <p>{`Same header-scan limitation as @if: the source expression is read to the first unmatched ) or ;. Prefer filteredItems over items.filter(...) inline.`}</p>
 
 <h2 id="lookup">{`Where to look`}</h2>

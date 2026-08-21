@@ -9,6 +9,7 @@ import './code-viewer.component';
 })
 export class Contributing extends ReactiveClass {
     toc = [
+        { href: '#how-to-read', label: 'How to read this page' },
         { href: '#structure', label: 'Project structure' },
         { href: '#state', label: 'ReactiveClass, @State, Proxy, subscribers' },
         { href: '#compiler', label: 'Template compiler' },
@@ -30,10 +31,18 @@ export class Contributing extends ReactiveClass {
         { name: 'docs', body: 'This site -- itself a Beautiful Eyes app.' },
     ];
 
+    pendingItems = [
+        { name: '@Computed()', body: 'Passthrough getter -- no caching, no dependency tracking. computedSubscribers and addComputedSubscribers exist but are unused. Implementation pending.' },
+        { name: '@switch / @case', body: 'Tokens and parseSwitch() exist; the parser body is empty. Use an @if / @else-if chain.' },
+        { name: '#ref', body: 'Parsed as reserved syntax, not wired to a live element reference.' },
+        { name: 'TaskQueue / comitBatchedItems', body: 'Imported and stubbed; @State notifies runSubscribers synchronously today.' },
+        { name: 'destroyed()', body: 'Empty method on the component subclass; nothing in View calls it on unmount.' },
+    ];
+
     subscriberRows = [
         { name: 'effectSubscribers', type: 'Map<DependencyFn, EffectFnName>', who: '@Effect via addEffectSubscribers', role: 'depFn -> effect method name. runSubscribers diffs depFn(this) against effectDepFnPreviousValue and calls the method for each changed index.' },
         { name: 'effectDepFnPreviousValue', type: 'Map<DependencyFn, any>', who: 'runSubscribers', role: 'Last depFn result, so the next pass can compare by index. First run has no previous value, so the effect is called once per slot with undefined.' },
-        { name: 'computedSubscribers', type: 'Map<string, Set<string>>', who: 'addComputedSubscribers', role: 'Reserved: state/computed name -> computed names. @Computed() is currently a passthrough, so this map stays empty in real apps.' },
+        { name: 'computedSubscribers', type: 'Map<string, Set<string>>', who: 'addComputedSubscribers -- implementation pending', role: 'Reserved for @Computed memoization. @Computed() is a passthrough getter today, so this map stays empty. Wiring it up is open work.' },
         { name: 'otherSubscriptions', type: 'Function[]', who: '@Component init via addOtherSubscription', role: 'Generic callbacks run after effects. The component pushes one function that walks reactiveElements.' },
     ];
 
@@ -89,7 +98,7 @@ c.effectDepFnPreviousValue
 // Map { }   // empty until the first runSubscribers
 
 c.computedSubscribers
-// Map { }   // unused while @Computed is a passthrough
+// Map { }   // implementation pending -- @Computed is a passthrough
 
 c.otherSubscriptions
 // []        // @Component init() will push the DOM walker`;
@@ -427,17 +436,49 @@ bootstrap(root, new Counter());`;
   ]
 }`;
 
-    ifRuntimeSample = `// View.addIfElseDirective
-const comment = document.createComment('if');
-let [lastIndex, nodes] = mountFirstTruthy(children);
-reactiveElements.set(comment, () => {
-    const next = indexOfFirstTruthy(children);
-    if(next === lastIndex) return;          // same branch -- skip
-    nodes.forEach(unMountNode);             // drop DOM + Map entries
-    nodes = mountBodyAt(children, next);
+    ifRuntimeSample = `// addIfElseDirective -- one comment, at most one mounted body
+
+const comment = document.createComment('if');   // always in the parent
+let lastIndex = -1;
+let nodes = [];
+
+function paint(){
+    const next = firstTruthyIndex(children);    // 0, 1, 2, or -1
+    if(next === lastIndex) return;              // same branch -- keep DOM
+    nodes.forEach(unMountNode);                 // drop old branch + its Map entries
+    nodes = next === -1 ? [] : buildNodeTree(children[next][1]);
+    comment.nodeChild = nodes;
     lastIndex = next;
-});
-return comment;  // the placeholder in the parent`;
+    queueMicrotask(() => insertAfter(comment, nodes));
+}
+
+paint();                                        // first paint
+reactiveElements.set(comment, paint);           // every later parent tick
+`;
+
+    ifChangeSample = `count = 2   // even -- first paint
+<!--if-->
+  <span>even</span>          // buildNodeTree(branch 0)  lastIndex = 0
+
+count = 4   // still even
+paint() sees next === 0 === lastIndex
+  return immediately         // the <span> stays
+  but { } inside the span still refresh:
+  they have their own reactiveElements entries on THIS component
+
+count = 3   // not even, is % 3
+paint() sees next === 1 !== 0
+  unMountNode(<span>even</span>)   // remove + delete Map keys
+  nodes = buildNodeTree(branch 1)  // brand new <span>by three</span>
+  insert after <!--if-->
+  lastIndex = 1
+
+count = 1   // neither -- @else
+same swap: destroy branch 1, mount branch 2 (<span>odd</span>)
+
+// no @else and every condition false:
+unMountNode(everything); nodes = []; lastIndex = -1
+<!--if--> remains; nothing after it`;
 
     forSource = `@for(index, item : items; key = trackById){
   <li>{index + ': ' + item.label}</li>
@@ -448,34 +489,110 @@ return comment;  // the placeholder in the parent`;
   name: 'for',
   itemVar: 'item',
   indexVar: 'index',
-  source: function(){ return this.items },
+  source: function(){ return this.items },   // re-read on every tick
   keyFn: function(){ return this.trackById },
   body: [
+    // STAMP -- one row's worth of template, not the whole list.
+    // Runtime calls buildNodeTree(body, [index, item]) once PER entry.
+    // 3 items => 3 separate <li>s, each with its own Text + Map entries.
     { type: 0, name: 'li', children: [
         function(index, item){ return index + ': ' + item.label },
     ]}
   ]
+}`;
+
+    forRuntimeSample = `// addForDirective
+const anchor = document.createComment('for');   // one, for the whole list
+let keyedEntries = new Map();                   // key -> { comment, item, index }
+
+function render(){
+    const items = source.call(component);       // current array
+    const next = new Map();
+    const order = [];
+
+    items.forEach((item, index) => {
+        const key = trackById(item, index);     // or index, if no keyFn
+        const existing = keyedEntries.get(key);
+
+        if(existing && existing.item === item && existing.index === index){
+            next.set(key, existing);            // REUSE this row's DOM
+            order.push(existing.comment);
+            return;
+        }
+
+        if(existing) unMountNode(existing.comment);  // same key, different item/index
+
+        const row = document.createComment('for-item');
+        const nodes = buildNodeTree(body, [index, item]);  // STAMP the row
+        row.nodeChild = nodes;
+        next.set(key, { comment: row, item, index });
+        order.push(row);
+    });
+
+    keyedEntries.forEach((entry, key) => {
+        if(!next.has(key)) unMountNode(entry.comment);     // gone from array
+    });
+
+    keyedEntries = next;
+    anchor.nodeChild = order;
+    queueMicrotask(() => spliceRowsAfter(anchor, order));
 }
-// loop vars are function parameters, not this.index / this.item`;
 
-    forRuntimeSample = `// reuse when ALL three match the previous row for that key:
-existing.item === item && existing.indexOrKey === indexOrKey
+render();                                       // first paint
+reactiveElements.set(anchor, render);           // every later parent tick
+`;
 
-// so:
-//   item.done = !item.done          -> reuse (same object, same index)
-//   items.splice(0, 1)              -> later rows remount (index shifted)
-//   items = items.map(x => ({...x})) -> remount (new object identity)
-//   two entries with the same key   -> throw`;
+    forChangeSample = `items = [
+  { id: 1, label: 'A' },
+  { id: 2, label: 'B' },
+]
+
+// first paint -- two stamps of body
+<!--for-->
+  <!--for-item-->   key=1  index=0  item=A
+    <li>0: A</li>
+  <!--for-item-->   key=2  index=1  item=B
+    <li>1: B</li>
+
+items.push({ id: 3, label: 'C' })
+render()
+  key 1,2: same item ref AND same index -> REUSE
+  key 3: new -> buildNodeTree(body, [2, C]) -> new <li>2: C</li>
+  no leftover keys to delete
+<!--for-->
+  ...A...  ...B...  ...C...      // C spliced after B
+
+items.pop()   // drop C
+render()
+  key 1,2 reuse
+  key 3 not in next -> unMountNode(C's for-item)
+                       removes <li>, deletes its Text from reactiveElements
+<!--for-->
+  ...A...  ...B...
+
+items.splice(0, 1)   // drop A, B slides to index 0
+render()
+  key 1 gone -> unMountNode(A)
+  key 2: same item ref BUT index 1 !== 0 -> DESTROY and rebuild B
+          (reuse requires key AND item AND index)
+
+item.done = !item.done   // in-place, same object, same index
+render()
+  reuse the <li>
+  {item.label} inside it still updates: that Text is in reactiveElements
+`;
 
     ifExampleTabs = [
         { key: 'template', label: 'template.be', code: this.ifSource },
         { key: 'emitted', label: 'emitted JS', code: this.ifEmit },
         { key: 'runtime', label: 'runtime', code: this.ifRuntimeSample },
+        { key: 'changes', label: 'when count changes', code: this.ifChangeSample },
     ];
 
     forExampleTabs = [
         { key: 'template', label: 'template.be', code: this.forSource },
         { key: 'emitted', label: 'emitted JS', code: this.forEmit },
         { key: 'runtime', label: 'runtime', code: this.forRuntimeSample },
+        { key: 'changes', label: 'when the array changes', code: this.forChangeSample },
     ];
 }
