@@ -1,4 +1,4 @@
-import { Component, ReactiveClass } from '@beautiful-eyes/core';
+import { Component, ReactiveClass, State } from '@beautiful-eyes/core';
 import template from './contributing.template.be';
 import './code-viewer.component';
 
@@ -8,18 +8,72 @@ import './code-viewer.component';
     useStyleSheets: []
 })
 export class Contributing extends ReactiveClass {
+    @State() activeSection = 'overview';
+    @State() navOpen = false;
+
     toc = [
-        { href: '#how-to-read', label: 'How to read this page' },
-        { href: '#structure', label: 'Project structure' },
-        { href: '#state', label: 'ReactiveClass, @State, Proxy, subscribers' },
-        { href: '#compiler', label: 'Template compiler' },
-        { href: '#interpolation', label: 'Interpolations, reactiveElements, otherSubscriptions' },
-        { href: '#component', label: '@Component, template, bootstrap' },
-        { href: '#children', label: 'How changes reach children' },
-        { href: '#ifelse', label: '@if / @else-if / @else' },
-        { href: '#for', label: '@for' },
-        { href: '#lookup', label: 'Where to look' },
+        { key: 'overview', label: 'Overview', heading: 'Start' },
+        { key: 'architecture', label: 'Architecture', heading: 'Internals' },
+        { key: 'state', label: 'ReactiveClass', heading: '' },
+        { key: 'compiler', label: 'Template compiler', heading: '' },
+        { key: 'interpolation', label: 'Interpolations', heading: '' },
+        { key: 'component', label: '@Component and bootstrap', heading: '' },
+        { key: 'view', label: 'View class', heading: '' },
+        { key: 'children', label: 'Parent to child', heading: '' },
+        { key: 'ifelse', label: '@if / @else', heading: '' },
+        { key: 'for', label: '@for', heading: '' },
+        { key: 'lookup', label: 'Where to look', heading: 'Reference' },
     ];
+
+    beFacts = [
+        { title: 'Proxy-based state', body: '@State wraps objects, arrays, Maps, and Sets. Mutate in place and that instance\'s bindings update -- no immutable-update boilerplate.' },
+        { title: 'Per-instance subscribers', body: 'A write notifies exactly this instance. There is no global store and no app-wide re-render.' },
+        { title: 'No virtual DOM', body: 'Each text node, attribute, @if branch, and @for row updates itself. View builds real DOM once and patches bindings.' },
+        { title: 'Angular-like surface', body: 'Decorators on TypeScript classes (@Component, @State, @Effect, @Input) and a separate .template.be file, not JSX.' },
+        { title: 'Vue-like change detection', body: 'Reactivity is Proxy interception on values you already read and write, not compiler-injected signals.' },
+    ];
+
+    contributeSteps = [
+        { title: 'Install', body: 'Clone the repo, npm install at the workspace root. Node workspaces wire every package under packages/.' },
+        { title: 'Run something', body: 'npm run start:qa is the smallest app. npm run start:docs is this site, itself written in Beautiful Eyes.' },
+        { title: 'Read Architecture, then the matching topic', body: 'Architecture is the map. Then open the topic for the file you will touch -- compiler before lexer.ts, View class before view.class.ts.' },
+        { title: 'Change one concern', body: 'Small pull requests are easier to review than a rewrite. Match the style of the file you are in.' },
+        { title: 'Open an issue or PR', body: 'The project is spare-time and marked work in progress. Issues and pull requests are welcome.' },
+    ];
+
+    folderTree = `Beautiful-Eyes/
+  package.json                 npm workspaces root
+  packages/
+    template-compiler/         .template.be -> JS module
+    reactiveClass/             ReactiveClass, @State, @Effect, @Input
+    core/                      @Component, View, bootstrap
+    lib/                       Proxify, shared types, TaskQueue stub
+    dynamic-import/            TS transformer (static import -> dynamic)
+    qa/                        smallest runnable example app
+    docs/                      this documentation site`;
+
+    contributeCommands = `git clone <this-repo-url>
+cd Beautiful-Eyes
+npm install
+npm run start:qa       # example app
+npm run start:docs     # this site`;
+
+    selectSection(key: string){
+        this.activeSection = key;
+        this.navOpen = false;
+        queueMicrotask(() => {
+            const pane = document.querySelector('.contrib-content');
+            if(pane) pane.scrollTop = 0;
+        });
+    }
+
+    toggleNav(){
+        this.navOpen = !this.navOpen;
+    }
+
+    closeNav(){
+        this.navOpen = false;
+    }
 
     packages = [
         { name: 'template-compiler', body: 'Webpack loader that compiles .template.be files (lexer -> parser -> AST -> visitor) into a plain JS module.' },
@@ -38,6 +92,480 @@ export class Contributing extends ReactiveClass {
         { name: 'TaskQueue / comitBatchedItems', body: 'Imported and stubbed; @State notifies runSubscribers synchronously today.' },
         { name: 'destroyed()', body: 'Empty method on the component subclass; nothing in View calls it on unmount.' },
     ];
+
+    archLayers = [
+        { when: 'Compile time', who: 'template-compiler + webpack', body: 'A .template.be import becomes a JS array. The browser never sees the source text. View only receives HtmlObj, functions, and DirectiveObj.' },
+        { when: 'Construct', who: 'reactiveClass + @Component + View', body: '@State installs accessors/Proxies. View.buildNodeTree walks the compiled array, creates real DOM, and fills reactiveElements. init() hooks that Map into otherSubscriptions.' },
+        { when: 'Mount', who: 'bootstrap', body: 'Appends view.root. Does not compile, bind, or tick. Directive bodies insert on a microtask once comment anchors have a parentNode.' },
+        { when: 'Tick', who: 'runSubscribers', body: 'A write on this instance runs effects, then every Map updater. There is no dirty-check of which interpolations read which fields. A child ticks only if applyProps writes a new @Input value.' },
+    ];
+
+    archFiles = [
+        { file: 'packages/template-compiler', body: 'Lexer, parser, AST, stringify. webpack loader entry is index.ts transform().' },
+        { file: 'packages/reactiveClass', body: 'ReactiveClass maps, @State, @Effect, @Input. Per-instance notify.' },
+        { file: 'packages/lib/src/Proxy', body: 'Proxify wraps objects/arrays/Maps/Sets. Traps call the same runSubscribers callback.' },
+        { file: 'packages/core/src/component', body: '@Component subclass, ComponentRegistry, reactiveElements, init().' },
+        { file: 'packages/core/src/View/view.class.ts', body: 'buildNodeTree, bindings, @if / @for, child components, unmount.' },
+        { file: 'packages/core/src/bootstrap/bootstrap.ts', body: 'Fragment-append view.root onto the mount element.' },
+    ];
+
+    archStorySample = `// one dummy used across this guide -- Counter
+
+// counter.template.be
+<button @click={inc}>{count}</button>
+
+// counter.ts
+@Component({ selector: 'Counter', useTemplate: template, useStyleSheets: [] })
+class Counter extends ReactiveClass {
+    @State() count = 0;
+    inc(){ this.count++; }
+}
+
+bootstrap(document.getElementById('root'), new Counter());
+
+
+// COMPILE TIME (webpack, once)
+transform(source)
+  Lexer  -> tokens  TAG_OPEN, TAG_NAME, ATTRIBUTE_NAME(@click), INTERPOLATION({inc}), ...
+  Parser -> HtmlElement button, eventHandlers.click, children Interpolation "count"
+  Stringify ->
+    [{ type: 0, name: 'button',
+       eventHandlers: { click: function(){ return this.inc } },
+       children: [ function(){ return this.count } ] }]
+
+
+// RUNTIME -- new Counter()
+1. super() / @State initializer
+     count is a number -> Proxify.get returns 0 as-is
+     accessor getter/setter installed
+2. subclass field  view = new View(this)
+     buildNodeTree walks the array
+       button = createElement('button')
+       addEventListener('click', inc)          // NOT in the Map
+       Text("0") + reactiveElements.set(text, updater)
+     view.root = [button]
+3. init()
+     otherSubscriptions.push(() => reactiveElements.forEach(fn => fn()))
+4. bootstrap
+     append button into #root
+     (if this template had @if/@for, those bodies insert on a microtask)
+
+
+// CLICK -- inc() { this.count++ }
+accessor setter stores 1, calls runSubscribers()
+  effects first (none here)
+  otherSubscriptions[0] walks the Map
+    Text updater: textContent = interpolation.call(component)  // "1"
+
+// that is the whole architecture:
+//   compile array  ->  View stamps DOM + Map  ->  write notifies  ->  Map paints
+`;
+
+    archTickSample = `// packages that run on a tick -- teaching shape
+
+@State setter / Proxy trap
+  -> instance.runSubscribers()            // reactiveClass.ts
+
+runSubscribers
+  1. effectSubscribers: depFn(this) vs previous array, call effects
+  2. otherSubscriptions: one fn pushed by @Component init()
+       reactiveElements.forEach(updater => updater())
+
+reactiveElements keys (filled by View, owned by this instance)
+  Text node        -> textContent = fn()
+  Element          -> re-apply dynamic attrs
+  Comment if       -> paint() maybe remount a branch
+  Comment for      -> render() reuse / stamp / unmount rows
+  Comment component-> applyProps onto the child
+
+NOT in the Map
+  @click listeners
+  literal attributes  class="box"
+  child interpolations -- those live on the CHILD Map
+`;
+
+    architectureTabs = [
+        { key: 'story', label: 'Counter end to end', code: this.archStorySample },
+        { key: 'tick', label: 'what a tick runs', code: this.archTickSample },
+    ];
+
+    stateFiles = [
+        { file: 'reactiveClass/src/reactiveClass/reactiveClass.ts', body: 'Per-instance maps. runSubscribers is the only notify entry.' },
+        { file: 'reactiveClass/src/state/state.decorator.ts', body: 'Field accessor + Proxify.get on the initial value.' },
+        { file: 'lib/src/Proxy/proxify/proxify.ts', body: 'Recursive Proxy. set / deleteProperty call the notify callback.' },
+        { file: 'reactiveClass/src/effect/effect.decorator.ts', body: 'addInitializer stores depFn -> method name. Method body is unchanged.' },
+        { file: 'reactiveClass/src/input/input.decorator.ts', body: 'Like @State with === skip. Used on child fields the parent writes.' },
+        { file: 'reactiveClass/src/computed/computed.decotrator.ts', body: 'Passthrough getter today. Do not treat as live memoization.' },
+    ];
+
+    stateChangeTips = [
+        'Keep effectSubscribers / otherSubscriptions on the instance, never static.',
+        'A notify must call runSubscribers -- both the accessor setter and the Proxy trap already do.',
+        'The setter does not re-run Proxify.get. If you want reassigned objects wrapped, that is new behavior.',
+        'TaskQueue is imported and unused. Notifies are synchronous. Do not assume batching exists.',
+        'Effects should write plain fields. Writing @State inside an effect re-enters runSubscribers.',
+        '@Computed wiring is open work -- see Expectations on Overview. Leave it unless that is the PR.',
+    ];
+
+    stateProxifySample = `// lib/src/Proxy/proxify/proxify.ts -- teaching shape
+
+Proxify.get(val, stateName, instance, parent, notify){
+    if(val == null || typeof val === 'number' || typeof val === 'string')
+        return val;                          // primitives: no Proxy
+
+    const handler = {
+        set(target, prop, value){
+            Reflect.set(target, prop, value);
+            notify();                        // same runSubscribers
+            return true;
+        },
+        deleteProperty(target, prop){
+            Reflect.deleteProperty(target, prop);
+            notify();
+            return true;
+        }
+    };
+
+    if(Array.isArray(val))   return wrapArray(val, handler);   // recurse items
+    if(isObject(val))        return wrapObject(val, handler);  // recurse keys
+    if(val instanceof Map)   return wrapMap(val, handler);
+    if(val instanceof Set)   return wrapSet(val, handler);
+}
+
+// @State() user = { name, tags: [] }
+//   user        -> Proxy
+//   user.tags   -> nested Proxy
+//   user.name   -> raw string
+//
+// this.user = { name: 'Bo' }  hits the ACCESSOR, not Proxify.get again
+// the new object is stored as-is unless you wrap it yourself
+`;
+
+    stateEffectSample = `// effect.decorator.ts -- teaching shape
+
+export function Effect(dependencyFn){
+    return function(target, context){
+        context.addInitializer(function(){
+            this.addEffectSubscribers(dependencyFn, context);
+            // effectSubscribers.set(dependencyFn, "logCount")
+        });
+        return function(...args){
+            return target.call(this, ...args);   // method unchanged
+        };
+    };
+}
+
+// depFn MUST return an array. runSubscribers compares by index with !==
+@Effect((ctx) => [ctx.count, ctx.user.name])
+sync(prev){ ... }
+
+// first notify: no previous array -> called once per slot with undefined
+// later: only slots whose value changed are called, with the OLD slot value
+`;
+
+    compilerFiles = [
+        { file: 'template-compiler/index.ts', body: 'transform(source): Lexer, Parser, Stringify.eval, return module.exports = array.' },
+        { file: 'src/lexer/lexer.ts', body: 'getNextToken. Meaning of @ $ { depends on prevToken. @for header is a special mode.' },
+        { file: 'src/parser/parser.ts', body: 'parseTag, parseAttribute (@ event, $ prop, # ref), parseIfElse, parseFor.' },
+        { file: 'src/nodes/*', body: 'AST classes: HtmlElement, Interpolation, StringNode, IfElse, For, HtmlAttribute, Ref.' },
+        { file: 'src/visitors/stringify/stringify.ts', body: 'Emits the JS array View consumes. visitInterpolation uses interpolationTranspiler + scope stack.' },
+        { file: 'src/interpolationTranspiler/interpolationTranspiler.ts', body: 'Prefix bare identifiers with this. unless they are @for locals.' },
+        { file: 'src/visitors/codeGenerator/codeGenerator.ts', body: 'Exists, unused. transform() comments it out. Stringify is the live emit path.' },
+        { file: 'src/visitors/visitor/visitor.ts', body: 'Scope stack for nested @for locals. Both visitors extend this.' },
+    ];
+
+    compilerChangeTips = [
+        'A new token needs token.enum.ts, TokenFactory, lexer, parser, an AST node, Visitor + Stringify, and usually View.',
+        'Attribute prefixes are decided in parser.parseAttribute from the first character of the name (@ $ #).',
+        'Stringify output is the contract with View. If you add a field to HtmlObj, View.buildHtmlElement must read it.',
+        'interpolationTranspiler does not understand JS -- it rewrites identifiers. Nested parens in @if/@for headers are not tracked.',
+        'CodeGenerator is dead. Do not extend it expecting transform() to call it.',
+        'Webpack config in packages/docs and packages/qa points at template-compiler/dist/index.js -- rebuild the compiler package after lexer/parser changes.',
+    ];
+
+    compilerTransformSample = `// template-compiler/index.ts -- this is the webpack loader
+
+export default function transform(source){
+    const lexer = new Lexer(source);
+    const parser = new Parser(lexer);
+    const ast = parser.parse();          // astNode[]
+    const stringify = new Stringify();
+    const js = stringify.eval(ast);      // "[ { type: 0, name: 'button', ... }, ]"
+    return 'module.exports = ' + js;
+}
+
+// webpack (docs + qa):
+//   test: /\\.template\\.be$/
+//   use:  template-compiler/dist/index.js
+`;
+
+    compilerLexerSample = `// lexer.ts -- teaching shape of getNextToken
+
+skip whitespace / newlines
+if EOF -> END_OF_FILE
+if insideForHeader -> getNextForHeaderToken()   // @for(...) until )
+
+switch currentChar:
+  '<'  -> TAG_OPEN
+  '>'  -> TAG_CLOSE
+  '/'  -> TAG_CLOSE_SLASH
+  '='  -> ASSIGNMENT
+  '@'  -> if prev was TAG_NAME / ATTRIBUTE_*  then readAttributeName (@click)
+          else AT_THE_RATE  (start of @if / @for / @else)
+  '$'  -> same: attribute name ($label) or DOLLAR
+  '{'  -> INTERPOLATION  (read until matching '}' -- this one DOES track braces)
+  '"' or "'" -> ATTRIBUTE_VALUE or TEXT depending on context
+
+readAttributeName continues while the name is a valid attr char.
+The parser later slices the prefix (@ $) and files the attribute
+into eventHandlers, props, or attributes.
+
+gotcha: @if(fn())  -- header scan stops at the first unmatched ')'
+        the inner () of fn() closes the header. Use a getter instead.
+`;
+
+    compilerParserSample = `// parser.ts -- teaching shape
+
+parseAttribute(){
+    if name starts with '@' -> EVENT_HANDLER, slice '@'
+    if name starts with '$' -> PROP, slice '$'
+    if token is HASH        -> REF  (parsed, not wired at runtime)
+    eat '='
+    if value is interpolation -> Interpolation AST
+    else                      -> StringNode
+}
+
+parseTag(){
+    eat '<' name
+    while not '>' : parseAttribute, bucket into attributes / events / props / ref
+    if self-close  -> HtmlElement with no children
+    else children = parse until '</name>'
+}
+
+parse() walks a sibling list until a stop token:
+  '<'     -> parseTag
+  '{'     -> Interpolation
+  '@if'   -> parseIfElse
+  '@for'  -> parseFor
+  text    -> StringNode   (only if the run starts with a letter)
+
+parseIfElse: [@if cond body], then @else-if..., then optional @else (cond = null)
+parseFor:    item | index,item  :  source  ; optional key = methodName
+`;
+
+    compilerStringifySample = `// stringify.ts -- teaching shape of the emit View reads
+
+visitHtmlElement(el){
+    return \`{
+      type: 0,
+      name: '\${el.tagName}',
+      attributes: { \${each attr} },
+      props: { \${each $prop} },
+      eventHandlers: { \${each @event} },
+      children: [ \${each child} ],
+    },\`;
+}
+
+visitInterpolation(node){
+    const scope = this.currentScope();          // @for locals, nested
+    const body = interpolationTranspiler(node.content, scope);
+    return \`function(\${scope.join(',')}){return \${body}},\`;
+}
+
+visitIfElse(node){
+    // children: [ [condFn | null, bodyArray], ... ]
+}
+
+visitFor(node){
+    pushScope([indexVar?, itemVar])
+    // body interpolations become function(index, item){ ... }
+    popScope()
+}
+
+eval(ast){ return '[' + ast.map(n => n.acceptVisitor(this)).join('') + ']'; }
+`;
+
+    compilerSourceTabs = [
+        { key: 'transform', label: 'transform()', code: this.compilerTransformSample },
+        { key: 'lexer', label: 'lexer', code: this.compilerLexerSample },
+        { key: 'parser', label: 'parser', code: this.compilerParserSample },
+        { key: 'stringify', label: 'stringify', code: this.compilerStringifySample },
+    ];
+
+    interpolationFiles = [
+        { file: 'interpolationTranspiler.ts', body: 'Rewrites count -> this.count. Leaves @for locals and string literals alone.' },
+        { file: 'stringify.ts visitInterpolation', body: 'Wraps the rewritten expression in function(scope...){ return ... }.' },
+        { file: 'view.class.ts buildInterpolationNode', body: 'First paint + Map entry on the Text node.' },
+        { file: 'view.class.ts addAttributes', body: 'Function-valued attrs share one Map entry on the element.' },
+        { file: 'component.decorator.ts init', body: 'Pushes the Map walker onto otherSubscriptions.' },
+        { file: 'view.class.ts unMountNode / removeFromReactiveElements', body: 'Deletes Map keys so a destroyed node is not called on the next tick.' },
+    ];
+
+    interpolationChangeTips = [
+        'There is no dependency list. If you add one, every interpolation, attr, @if, @for, and applyProps path has to opt in.',
+        'Updaters close over args from @for. Changing how args are passed must stay in sync with stringify scope and buildNodeTree(body, args).',
+        'Whitespace between two interpolations is dropped. That is lexer/parser, not View.',
+        'unMountNode must delete Map keys. Leaving a Text node in the Map after remove() will throw or update a detached node forever.',
+    ];
+
+    componentFiles = [
+        { file: 'core/src/component/component.decorator.ts', body: 'Subclasses the user class. Adds template getter, reactiveElements, View, init, destroyed stub.' },
+        { file: 'core/src/component/componentRegistry.ts', body: 'selector -> constructor. Duplicate selector throws. View.buildHtmlElement looks up tag names here.' },
+        { file: 'core/src/View/view.class.ts', body: 'Runs during the field initializer, before init().' },
+        { file: 'core/src/bootstrap/bootstrap.ts', body: 'Append only. No compile, no bind.' },
+    ];
+
+    componentChangeTips = [
+        'Construction order is super (@State) -> view = new View (bindings) -> init (hook Map) -> bootstrap (append). Do not move View after init or interpolations miss the walker.',
+        'destroyed() is empty. If you add unmount-from-parent, View.unMountNode is the existing inverse.',
+        'ComponentRegistry keys are selector strings from @Component({ selector }). Tag names in templates must match exactly, including case.',
+        'useStyleSheets is accepted and unused. Do not document it as live CSS injection.',
+    ];
+
+    componentDecoratorSample = `// component.decorator.ts -- teaching shape
+
+function Component(options){
+    return function(UserClass){
+        class Component extends UserClass {
+            static _template = options.useTemplate;   // compiled array
+            reactiveElements = new Map();             // Node -> updater
+            _HtmlParent = document.body;              // unused for insert
+            view = new View(this, this._HtmlParent);  // buildNodeTree NOW
+
+            constructor(...args){
+                super(...args);                       // @State first
+                this.init();                          // hook Map second
+            }
+
+            init(){
+                this.addOtherSubscription(() => {
+                    this.reactiveElements.forEach(fn => fn.call(this));
+                });
+            }
+
+            destroyed(){ /* empty -- not called today */ }
+
+            get template(){ return Component._template; }
+        }
+
+        if(ComponentRegistry.has(options.selector))
+            throw new Error('duplicate selector');
+        ComponentRegistry.set(options.selector, Component);
+        return Component;
+    };
+}
+
+// View.buildHtmlElement:
+const Ctor = ComponentRegistry.get(htmlObj.name);
+if(Ctor) return buildComponent(...);   // <Badge />
+else     createElement(htmlObj.name);  // <button>
+`;
+
+    viewFiles = [
+        { file: 'view.class.ts constructor / buildNodeTree', body: 'Dispatch: string, function, HTML_ELEMENT, DIRECTIVE.' },
+        { file: 'buildHtmlElement / buildComponent', body: 'Registry hit vs createElement. Child gets its own View.' },
+        { file: 'buildInterpolationNode / addAttributes / addEventListeners', body: 'Map vs one-shot listeners.' },
+        { file: 'addIfElseDirective / addForDirective', body: 'Comment holes, stamps, keyed reuse.' },
+        { file: 'appendChildrenToParent / flattenForDisplay', body: 'Element appendChild vs comment.after. Cursor must skip a comment span.' },
+        { file: 'unMountNode / removeFromReactiveElements', body: 'Destroy DOM + Map keys. Shared by @if swap, @for delete, child teardown.' },
+    ];
+
+    viewChangeTips = [
+        'Comments are the public node of @if / @for / child components. Returning a wrapper element will break ul > li and CSS.',
+        'queueMicrotask before comment.after -- first paint runs while view.root is detached.',
+        'appendChildrenToParent must advance past flattenForDisplay(comment), not the comment itself.',
+        'args is how @for locals reach interpolations. Nested @for concatenates. Keep that contract if you change stamping.',
+        'updatorFunctions on View is unused. Bindings live on component.reactiveElements.',
+        'parentEl on the constructor is unused for insert. bootstrap / appendChildrenToParent do that.',
+    ];
+
+    childrenFiles = [
+        { file: 'view.class.ts buildComponent', body: 'new Child(), applyProps, comment updater re-applies props on parent ticks.' },
+        { file: 'view.class.ts applyProps', body: 'Eval functions with the PARENT as this, assign onto the CHILD.' },
+        { file: 'input.decorator.ts', body: '=== skip then runSubscribers on the child. That is the only child tick from a parent write.' },
+        { file: 'componentRegistry.ts', body: 'Tag name lookup. Missing selector -> treated as a real DOM unknown tag.' },
+    ];
+
+    childrenChangeTips = [
+        'Parent Map never walks child interpolations. If a child is stale, check applyProps + @Input ===, not the parent walker.',
+        'Object $props pass the same proxy. Nested mutation will not tick the child.',
+        '@onPing is applyProps onto a plain field, not addEventListener. The child must call it.',
+        'Child @State is isolated. Parent-to-child is @Input. Child-to-parent is a callback field.',
+    ];
+
+    ifelseFiles = [
+        { file: 'parser.ts parseIfElse', body: 'Walks @if, @else-if..., optional @else. @else stores null as the condition.' },
+        { file: 'stringify.ts visitIfElse', body: 'Emits children: [ [condFn|null, bodyStamp], ... ].' },
+        { file: 'view.class.ts addIfElseDirective', body: '<!--if--> + lastIndex + paint(). Same index keeps DOM.' },
+        { file: 'view.class.ts unMountNode', body: 'Destroys the previous branch and its Map entries on a swap.' },
+    ];
+
+    ifelseChangeTips = [
+        'Branches are created and destroyed, not hidden. That is why interpolations inside a hidden branch do not run -- they are not in the Map.',
+        'The comment must stay in the parent when the body is empty.',
+        'Lexer header scan has no nested-paren tracking. Document that in any new condition syntax.',
+        'Nested @if inside @for is a comment in that row\'s nodeChild. unMountNode of the row must recurse.',
+    ];
+
+    ifParserSample = `// parser.parseIfElse -- teaching shape
+
+eat @if ( cond ) { body }
+branches.push([ new Interpolation(cond), body ])
+
+while next is @else-if:
+    eat @else-if ( cond ) { body }
+    branches.push([ new Interpolation(cond), body ])
+
+if next is @else:
+    eat @else { body }
+    branches.push([ null, body ])          // always matches if nothing above did
+
+return new IfElse(branches)
+
+// lone @else-if / @else throws (no leading @if)
+// stringify: cond null emits the literal null, not a function
+`;
+
+    forFiles = [
+        { file: 'parser.ts parseFor', body: 'item : source  or  index, item : source ; key = method.' },
+        { file: 'stringify.ts visitFor', body: 'Pushes loop vars onto the visitor scope stack, emits body as a stamp.' },
+        { file: 'view.class.ts addForDirective', body: '<!--for--> + keyed Map of <!--for-item-->. Reuse needs key AND item ref AND index.' },
+        { file: 'view.class.ts flattenForDisplay', body: 'Moves a multi-node row as one block.' },
+    ];
+
+    forChangeTips = [
+        'body is a stamp for ONE row. Never pre-expand the list at compile time -- length is unknown.',
+        'Reuse is stricter than typical keyed lists: index must match too. A splice remounts shifted rows even with key = trackById. Changing that is a behavior change; tests in qa should cover push/pop/splice.',
+        'Duplicate keys throw. Keep that -- silent overwrite would leak DOM.',
+        'Nested @for concatenates args. Inner interpolations must still see outer item.',
+        'Source expression has the same unmatched ) / ; header limit as @if.',
+    ];
+
+    forParserSample = `// parser.parseFor -- teaching shape
+
+eat @for (
+first = identifier
+if next is ',':
+    indexVar = first
+    eat ','
+    itemVar = identifier
+else
+    itemVar = first
+
+eat ':'
+source = interpolation          // this.items
+optional: ';' 'key' '=' identifier   // trackById method name on the component
+eat )
+eat { body }
+eat }
+
+// stringify
+source: function(){ return this.items }
+keyFn:  function(){ return this.trackById }   // or null
+pushScope([indexVar?, itemVar])
+body interpolations: function(index, item){ return item.label }
+popScope()
+`;
 
     subscriberRows = [
         { name: 'effectSubscribers', type: 'Map<DependencyFn, EffectFnName>', who: '@Effect via addEffectSubscribers', role: 'depFn -> effect method name. runSubscribers diffs depFn(this) against effectDepFnPreviousValue and calls the method for each changed index.' },
@@ -70,7 +598,7 @@ export class Contributing extends ReactiveClass {
         { task: 'Change how components mount or receive props', files: 'view.class.ts (buildComponent), component.decorator.ts, componentRegistry.ts' },
         { task: 'Change how interpolations bind', files: 'interpolationTranspiler.ts, stringify.ts visitInterpolation, view.class.ts buildInterpolationNode' },
         { task: 'Change how parent props reach a child', files: 'view.class.ts (buildComponent, applyProps), input.decorator.ts' },
-        { task: 'Change how @for reconciles a list', files: 'view.class.ts (addForDirective, flattenForDisplay)' },
+        { task: 'Change how the DOM is built or unmounted', files: 'view.class.ts (buildNodeTree, appendChildrenToParent, unMountNode)' },
     ];
 
     dummyClassSample = `class Counter extends ReactiveClass {
@@ -141,6 +669,13 @@ return function(val){
     });
     this.otherSubscriptions.forEach(fn => fn.call(this));
 }`;
+
+    stateSourceTabs = [
+        { key: 'run', label: 'runSubscribers', code: this.dummyRunSubscribersSample },
+        { key: 'state', label: '@State', code: this.dummyStateDecoratorSample },
+        { key: 'proxy', label: 'Proxify', code: this.stateProxifySample },
+        { key: 'effect', label: '@Effect', code: this.stateEffectSample },
+    ];
 
     singleElSource = `<div class="box">{count}</div>`;
 
@@ -406,8 +941,325 @@ bootstrap(root, new Counter());`;
     counterExampleTabs = [
         { key: 'template', label: 'counter.template.be', code: this.counterTemplateSample },
         { key: 'component', label: 'counter.ts', code: this.counterClassSample },
+        { key: 'decorator', label: '@Component subclass', code: this.componentDecoratorSample },
         { key: 'bindings', label: 'after mount', code: this.counterBindingsSample },
         { key: 'bootstrap', label: 'bootstrap.ts', code: this.counterBootstrapSample },
+    ];
+
+    viewMethodRows = [
+        { name: 'constructor', body: 'Stores the component, immediately runs buildNodeTree() and assigns view.root. The parentEl argument is unused for insertion -- bootstrap / appendChildrenToParent do that later.' },
+        { name: 'root', body: 'Array of top-level HTMLElement | Text | Comment. A comment here is an @if, @for, or child component at the template root.' },
+        { name: 'buildNodeTree', body: 'Walks a compiled array. string -> Text, function -> interpolation Text + Map entry, HtmlObj -> element or child component, DIRECTIVE -> if/for. The args extra array is @for loop variables passed into interpolations.' },
+        { name: 'buildHtmlElement', body: 'ComponentRegistry.get(tagName) decides component vs real DOM. Real elements get events, attributes, then a recursive buildNodeTree of children appended into the element.' },
+        { name: 'buildComponent', body: 'Comment component:Name, new Child(), applyProps, stash child.view.root on nodeChild, microtask-insert after the comment, Map entry re-applies props.' },
+        { name: 'appendChildrenToParent', body: 'Element parent: appendChild. Comment parent: only if comment.parentNode is set, then after() each child. Nested comments expand via nodeChild; the cursor skips the whole flattenForDisplay span so the next sibling is not spliced into the middle.' },
+        { name: 'flattenForDisplay', body: 'Comment plus every node in nodeChild, recursively. Used to move or skip a whole @for row (comment + li + nested if) as one unit.' },
+        { name: 'unMountNode', body: 'If Comment, recurse nodeChild first. Then delete this node from reactiveElements and el.remove(). That is how a swapped @if branch or a popped @for row drops both DOM and bindings.' },
+        { name: 'updatorFunctions', body: 'Declared, unused. Bindings go on component.reactiveElements instead.' },
+    ];
+
+    viewOverviewSample = `// packages/core/src/View/view.class.ts -- teaching shape
+
+class View {
+    root = [];                    // top-level nodes for bootstrap
+    constructor(component){
+        this.component = component;
+        this.root = this.buildNodeTree();   // now, before init()
+    }
+
+    buildNodeTree(template = component.template, args = []){
+        // args = [index, item] inside @for, else []
+        return template.map(node => {
+            if(typeof node === 'string')   return text(node);
+            if(typeof node === 'function') return interpolation(node, args);
+            if(node.name in registry)      return childComponent(node, args);
+            if(node.name === 'ifElse')     return addIfElse(node, args);
+            if(node.name === 'for')        return addFor(node, args);
+            return realElement(node, args);
+        });
+    }
+}
+
+// every structural hole is a Comment with an extra JS property:
+comment.nodeChild = [ /* nodes this comment owns */ ]
+`;
+
+    viewWalkthroughSample = `// dummy template this section walks
+
+<div class="box">
+  Hello {name}
+  @if(open){ <span>yes</span> }
+  @for(item : items){ <li>{item}</li> }
+  <Badge $label={name} />
+</div>
+
+// compiled array View receives (teaching shape)
+
+[
+  {
+    type: HTML_ELEMENT, name: 'div',
+    attributes: { class: 'box' },
+    children: [
+      'Hello ',
+      function(){ return this.name },
+      { type: DIRECTIVE, name: 'ifElse', children: [ ... ] },
+      { type: DIRECTIVE, name: 'for', source, body: [ ... ] },
+      { type: HTML_ELEMENT, name: 'Badge', props: { label: fn } }
+    ]
+  }
+]
+
+// after buildNodeTree -- view.root[0] is the div
+
+div.box
+  Text "Hello "              // static, no Map
+  Text "Ada"                 // interpolation, Map updater
+  <!--if-->                  // Map paint(); nodeChild = [span]
+    span "yes"
+  <!--for-->                 // Map render(); nodeChild = [for-item...]
+    <!--for-item-->
+      li
+        Text "A"             // interpolation, args = [item]
+  <!--component:Badge-->     // Map applyProps; nodeChild = child.view.root
+`;
+
+    viewBuildTreeSample = `// how View builds the DOM tree -- teaching shape of buildNodeTree
+
+function buildNodeTree(template, args = []){
+    const out = [];
+    for(const node of template){
+        if(!node) continue;
+
+        if(typeof node === 'string'){
+            out.push(document.createTextNode(node));          // static text
+        }
+        else if(typeof node === 'function'){
+            out.push(buildInterpolationNode(node, args));     // {expr}
+        }
+        else if(node.type === HTML_ELEMENT){
+            out.push(buildHtmlElement(node, args));           // tag or child component
+        }
+        else if(node.type === DIRECTIVE){
+            out.push(buildDirectives(node, args));            // @if / @for
+        }
+    }
+    return out;
+}
+
+function buildHtmlElement(obj, args){
+    const Ctor = ComponentRegistry.get(obj.name);
+    if(Ctor) return buildComponent(obj, Ctor, args);
+
+    const el = document.createElement(obj.name);
+    addEventListeners(el, obj.eventHandlers, args);   // once
+    addAttributes(el, obj.attributes, args);          // literals now, fns -> Map
+    const kids = buildNodeTree(obj.children, args);   // recurse
+    appendChildrenToParent(kids, el);                 // appendChild -- el is live-enough
+    return el;
+}
+
+// top-level call: this.root = buildNodeTree()
+// nested @for row: buildNodeTree(directive.body, [index, item])
+`;
+
+    viewBindSample = `// how View attaches bindings -- teaching shape
+
+function buildInterpolationNode(fn, args){
+    const text = fn.call(component, ...args);          // first paint
+    const textNode = document.createTextNode(text);
+    component.reactiveElements.set(textNode, () => {
+        textNode.textContent = fn.call(component, ...args);
+    });
+    return textNode;
+}
+
+function addAttributes(el, attributes, args){
+    const dynamic = [];
+    for(const key in attributes){
+        const val = attributes[key];
+        if(typeof val === 'function') dynamic.push(key);
+        else applyAttribute(el, key, val);             // class="box" -- once
+    }
+    if(!dynamic.length) return;
+    const update = () => {
+        dynamic.forEach(key => {
+            applyAttribute(el, key, attributes[key].call(component, ...args));
+        });
+    };
+    update();                                          // first paint
+    component.reactiveElements.set(el, update);        // later ticks
+}
+
+function addEventListeners(el, handlers, args){
+    for(const name in handlers){
+        let fn = handlers[name].call(component, ...args);
+        if(typeof fn === 'function') fn = fn.bind(component, ...args);
+        el.addEventListener(name, fn);                 // NOT in the Map
+    }
+}
+
+// init() later:
+component.addOtherSubscription(() => {
+    component.reactiveElements.forEach(fn => fn.call(component));
+});
+`;
+
+    viewDirectiveSample = `// how View renders directives -- teaching shape
+
+function buildDirectives(directive, args){
+    if(directive.name === 'ifElse') return addIfElse(directive.children, args);
+    if(directive.name === 'for')    return addFor(directive, args);
+}
+
+function addIfElse(branches, args){
+    const comment = document.createComment('if');      // returned to parent
+    let last = -1, nodes = [];
+
+    function paint(){
+        const i = firstTruthy(branches, args);         // or -1
+        if(i === last) return;
+        nodes.forEach(unMountNode);
+        nodes = i === -1 ? [] : buildNodeTree(branches[i][1], args);
+        comment.nodeChild = nodes;
+        last = i;
+        queueMicrotask(() => insertAfter(comment, nodes));
+    }
+
+    paint();
+    component.reactiveElements.set(comment, paint);
+    return comment;
+}
+
+function addFor(directive, args){
+    const anchor = document.createComment('for');
+    let keyed = new Map();
+
+    function render(){
+        const items = directive.source.call(component, ...args);
+        const next = new Map(), order = [];
+
+        items.forEach((item, index) => {
+            const key = track(directive, item, index, args);
+            const prev = keyed.get(key);
+            if(prev && prev.item === item && prev.index === index){
+                next.set(key, prev); order.push(prev.comment); return;
+            }
+            if(prev) unMountNode(prev.comment);
+
+            const row = document.createComment('for-item');
+            const rowArgs = directive.indexVar ? [...args, index, item] : [...args, item];
+            row.nodeChild = buildNodeTree(directive.body, rowArgs);  // stamp
+            next.set(key, { comment: row, item, index });
+            order.push(row);
+        });
+
+        keyed.forEach((entry, key) => { if(!next.has(key)) unMountNode(entry.comment); });
+        keyed = next;
+        anchor.nodeChild = order;
+        queueMicrotask(() => spliceRowsAfter(anchor, order));
+    }
+
+    render();
+    component.reactiveElements.set(anchor, render);
+    return anchor;
+}
+`;
+
+    commentAnchorSample = `// comments are insertion holes that are not elements
+
+<ul>
+  <!--for-->                         // list hole -- always here
+    <!--for-item-->                  // row 0 handle
+      <li>0: A</li>
+      <!--if-->                      // nested hole inside the row
+        <span>open</span>
+    <!--for-item-->                  // row 1 handle
+      <li>1: B</li>
+      <!--if-->                      // this row's if is false -- comment only
+</ul>
+
+// why not a wrapper <div>?
+//   a extra element would break CSS (ul > li), flex, tables
+//   a Comment has no box, no style, no tag name
+//
+// nodeChild (a JS property on the Comment, not a DOM API):
+//   <!--if-->.nodeChild        = current branch nodes (or [])
+//   <!--for-->.nodeChild       = ordered <!--for-item--> comments
+//   <!--for-item-->.nodeChild  = that row's stamped nodes
+//   <!--component:Badge-->.nodeChild = child.view.root
+`;
+
+    commentIfHelpSample = `<!--if--> jobs
+
+1. Slot in the parent
+   buildNodeTree returns the comment, not the <span>.
+   The parent always has a stable node to sit next to
+   siblings, even when the branch is empty.
+
+2. Insertion cursor
+   body is built in memory, then
+   queueMicrotask(() => insertAfter(comment, nodes))
+   because comment.after() needs comment.parentNode.
+   First paint often runs before bootstrap appends view.root,
+   so the microtask waits until the comment is in the live tree.
+
+3. reactiveElements key
+   the Map entry is the comment, not the <span>.
+   paint() can replace the <span> without losing the updater.
+
+4. Ownership for unmount
+   comment.nodeChild lists what to destroy when the branch
+   changes. unMountNode(comment) would walk that list.
+   paint() walks nodeChild, then leaves the comment itself.
+
+count even -> odd
+  unMountNode(old <span>even</span>)   // not the <!--if-->
+  newNodes = buildNodeTree(odd stamp)
+  comment.nodeChild = newNodes
+  insertAfter(comment, newNodes)
+`;
+
+    commentForHelpSample = `<!--for--> vs <!--for-item-->
+
+<!--for-->  one per @for, never per row
+  - the hole in the parent (same jobs as <!--if-->)
+  - the reactiveElements key: render() is the updater
+  - nodeChild = [for-item comments in current order]
+    so unMountNode(the whole list) or a parent @if destroying
+    this @for can walk every row
+
+<!--for-item-->  one per live row
+  - the handle render() stores in keyedEntries
+  - reuse means keep this comment + its nodeChild
+  - new row: create comment, stamp body, set nodeChild
+  - delete row: unMountNode(this comment)
+      -> recurse nodeChild (the <li>, nested <!--if-->)
+      -> delete Map keys
+      -> comment.remove()
+  - reorder: flattenForDisplay(for-item)
+      = [comment, <li>, nested comments, ...]
+      move that span as one block after the previous row
+
+without for-item, reuse would have to key the <li> itself.
+a row whose stamp is several nodes (li + if-comment + span)
+would have no single owner. for-item is that owner.
+`;
+
+    viewExampleTabs = [
+        { key: 'overview', label: 'View overview', code: this.viewOverviewSample },
+        { key: 'walk', label: 'dummy walkthrough', code: this.viewWalkthroughSample },
+        { key: 'build', label: 'buildNodeTree', code: this.viewBuildTreeSample },
+        { key: 'bind', label: 'attach bindings', code: this.viewBindSample },
+        { key: 'directives', label: 'render directives', code: this.viewDirectiveSample },
+        { key: 'comments', label: 'comment tree', code: this.commentAnchorSample },
+    ];
+
+    ifCommentTabs = [
+        { key: 'if-comment', label: '<!--if--> jobs', code: this.commentIfHelpSample },
+    ];
+
+    forCommentTabs = [
+        { key: 'for-comments', label: '<!--for--> and <!--for-item-->', code: this.commentForHelpSample },
     ];
 
     ifSource = `@if(count % 2 === 0){
@@ -584,6 +1436,7 @@ render()
 
     ifExampleTabs = [
         { key: 'template', label: 'template.be', code: this.ifSource },
+        { key: 'parser', label: 'parseIfElse', code: this.ifParserSample },
         { key: 'emitted', label: 'emitted JS', code: this.ifEmit },
         { key: 'runtime', label: 'runtime', code: this.ifRuntimeSample },
         { key: 'changes', label: 'when count changes', code: this.ifChangeSample },
@@ -591,6 +1444,7 @@ render()
 
     forExampleTabs = [
         { key: 'template', label: 'template.be', code: this.forSource },
+        { key: 'parser', label: 'parseFor', code: this.forParserSample },
         { key: 'emitted', label: 'emitted JS', code: this.forEmit },
         { key: 'runtime', label: 'runtime', code: this.forRuntimeSample },
         { key: 'changes', label: 'when the array changes', code: this.forChangeSample },
