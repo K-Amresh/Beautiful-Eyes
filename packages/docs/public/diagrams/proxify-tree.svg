@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 400" role="img" aria-labelledby="title desc">
+  <title id="title">Proxify wraps nested objects and arrays</title>
+  <desc id="desc">An object @State value is recursively Proxy-wrapped. Nested primitives stay raw. Nested arrays and objects each get their own Proxy with the same set/delete traps.</desc>
+  <rect width="760" height="400" fill="#0f1115"/>
+  <text x="380" y="28" text-anchor="middle" fill="#7c9dff" font-family="system-ui, sans-serif" font-size="13" font-weight="700">@State() user = { name: 'Ada', tags: ['core'] }</text>
+
+  <rect x="250" y="52" width="260" height="56" rx="8" fill="#2a3358" stroke="#7c9dff"/>
+  <text x="380" y="74" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="13" font-weight="700">Proxify.get(value)</text>
+  <text x="380" y="94" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">cb always = runSubscribers on this</text>
+
+  <line x1="380" y1="108" x2="380" y2="140" stroke="#7c9dff" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="220" y="144" width="320" height="52" rx="8" fill="#161922" stroke="#7c9dff"/>
+  <text x="380" y="166" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="13" font-weight="700">Proxy(user)</text>
+  <text x="380" y="184" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">set / deleteProperty -> notify</text>
+
+  <line x1="280" y1="196" x2="160" y2="236" stroke="#7c9dff" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="480" y1="196" x2="600" y2="236" stroke="#7c9dff" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="40" y="244" width="240" height="64" rx="8" fill="#161922" stroke="#262b38"/>
+  <text x="160" y="270" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="13" font-weight="700">name: 'Ada'</text>
+  <text x="160" y="290" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">primitive - not wrapped</text>
+
+  <rect x="480" y="244" width="240" height="64" rx="8" fill="#161922" stroke="#7c9dff"/>
+  <text x="600" y="270" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="13" font-weight="700">Proxy(tags)</text>
+  <text x="600" y="290" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">array - nested Proxy</text>
+
+  <line x1="600" y1="308" x2="600" y2="336" stroke="#7c9dff" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="480" y="340" width="240" height="40" rx="8" fill="#161922" stroke="#262b38"/>
+  <text x="600" y="365" text-anchor="middle" fill="#e7e9ee" font-family="system-ui, sans-serif" font-size="12">[0] = 'core'  (primitive)</text>
+
+  <text x="160" y="340" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">this.user.name = 'Bo' -> trap</text>
+  <text x="160" y="358" text-anchor="middle" fill="#9aa1b2" font-family="system-ui, sans-serif" font-size="11">this.user.tags.push('ui') -> trap</text>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7c9dff"/>
+    </marker>
+  </defs>
+</svg>
