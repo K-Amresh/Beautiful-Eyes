@@ -43,7 +43,8 @@
     "packages/lib",
     "packages/dynamic-import",
     "packages/reactiveClass",
-    "packages/docs"
+    "packages/docs",
+    "packages/create"
   ],
   "dependencies": {
   }

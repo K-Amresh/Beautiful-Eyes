@@ -49,6 +49,7 @@ export class Contributing extends ReactiveClass {
     core/                      @Component, View, bootstrap
     lib/                       Proxify, shared types, TaskQueue stub
     dynamic-import/            TS transformer (static import -> dynamic)
+    create/                    npx @beautiful-eyes/create scaffolder
     qa/                        smallest runnable example app
     docs/                      this documentation site`;
 
@@ -83,6 +84,7 @@ npm run start:docs     # this site`;
         { name: 'dynamic-import', body: 'A TypeScript transformer: rewrites static imports into dynamic ones.' },
         { name: 'qa', body: 'A small example app used to exercise the framework end-to-end.' },
         { name: 'docs', body: 'This site -- itself a Beautiful Eyes app.' },
+        { name: 'create', body: 'npx @beautiful-eyes/create -- copies a webpack starter and installs dependencies.' },
     ];
 
     pendingItems = [

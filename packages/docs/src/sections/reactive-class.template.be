@@ -22,7 +22,7 @@
 <p>{`Currently @Computed() is a plain passthrough -- it does not cache the result or track dependencies yet. It is safe to use exactly like an undecorated getter; just do not expect memoization.`}</p>
 
 <h2>{`@Input()`}</h2>
-<p>{`A field decorator used on components, for values a parent passes in as a prop (see the Components tab).`}</p>
+<p>{`A field decorator used on components, for values a parent passes in as a prop (see Components in the Docs side nav).`}</p>
 <pre>{inputSample}</pre>
 <p>{`It behaves like @State(), except the setter skips the re-render pass when the incoming value is identical to the current one -- a parent re-applies every prop on every one of its own re-renders, not just when that particular prop changed.`}</p>
 

@@ -1,0 +1,33 @@
+{
+  "name": "@beautiful-eyes/create",
+  "version": "1.0.0",
+  "description": "Scaffold a Beautiful Eyes app: npx @beautiful-eyes/create my-app",
+  "bin": {
+    "create-beautiful-eyes": "./bin/create.js"
+  },
+  "files": [
+    "bin",
+    "template",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AmKreta/Beautiful-Eyes",
+    "directory": "packages/create"
+  },
+  "homepage": "https://beautiful-eyes.netlify.app/",
+  "keywords": [
+    "beautiful-eyes",
+    "create",
+    "scaffold",
+    "webpack"
+  ],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -31,7 +31,17 @@
 ## Quick start
 
 ```sh
-git clone <this-repo-url>
+npx @beautiful-eyes/create my-app
+cd my-app
+npm start
+```
+
+Same scaffold: `npm create @beautiful-eyes my-app`. Full walkthrough: **Get Started** on [beautiful-eyes.netlify.app](https://beautiful-eyes.netlify.app/).
+
+To work on this repo:
+
+```sh
+git clone https://github.com/AmKreta/Beautiful-Eyes
 cd Beautiful-Eyes
 npm install
 npm run start:qa      # a small example app
@@ -53,6 +63,7 @@ This is an npm-workspaces monorepo. Each package under `packages/` has one job:
 | [`template-compiler`](packages/template-compiler) | [`@beautiful-eyes/template-compiler`](https://www.npmjs.com/package/@beautiful-eyes/template-compiler) | Webpack loader that compiles `.template.be` files (lexer → parser → AST → visitor) into a plain JS module. |
 | [`lib`](packages/lib) | [`@beautiful-eyes/lib`](https://www.npmjs.com/package/@beautiful-eyes/lib) | Shared utilities used across packages -- the `Proxy` machinery, shared types, a task queue. |
 | [`dynamic-import`](packages/dynamic-import) | [`@beautiful-eyes/dynamic-import`](https://www.npmjs.com/package/@beautiful-eyes/dynamic-import) | A TypeScript transformer that rewrites static imports (`import './x'`) into dynamic ones (`import('./x')`). |
+| [`create`](packages/create) | [`@beautiful-eyes/create`](https://www.npmjs.com/package/@beautiful-eyes/create) | `npx @beautiful-eyes/create my-app` -- webpack, TypeScript, and a first counter. |
 | [`qa`](packages/qa) | — | A small example app used to exercise the framework end-to-end. |
 | [`docs`](packages/docs) | — | The documentation site -- itself a Beautiful Eyes app. Deployed via the `netlify.toml` at the repo root. |
 
