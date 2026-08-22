@@ -1,10 +1,12 @@
 {
   "name": "@beautiful-eyes/core",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Beautiful Eyes runtime -- @Component, View, bootstrap, and reactive decorators.",
   "main": "index.js",
+  "types": "index.ts",
   "files": [
     "src",
+    "index.js",
     "index.ts",
     "README.md"
   ],
@@ -24,9 +26,11 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "entry":"index.ts",
   "exports": {
-    ".": "./index.ts"
+    ".": {
+      "types": "./index.ts",
+      "default": "./index.js"
+    }
   },
   "dependencies": {
     "@beautiful-eyes/lib":"*",
