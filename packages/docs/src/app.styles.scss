@@ -677,6 +677,18 @@ td code {
   font-family: "SF Mono", Menlo, Consolas, monospace;
 }
 
+.demo-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.demo-row .demo-input {
+  margin-bottom: 0;
+  max-width: 240px;
+}
+
 .demo-chips {
   display: flex;
   gap: 8px;

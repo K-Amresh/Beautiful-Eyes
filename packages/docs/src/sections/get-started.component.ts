@@ -80,7 +80,8 @@ module.exports = {
     nextSteps = [
         { title: 'Templates', body: 'Interpolations, @if / @else, @for, events, and $props.' },
         { title: 'Reactive Class', body: '@State, Proxy mutation, and @Effect.' },
-        { title: 'Components', body: 'Nesting, @Input, and parent-to-child props.' },
+        { title: 'Components', body: '@Component options, registration, and using a tag from a template.' },
+        { title: 'Children', body: '@Input, the component comment, and how a child is stored in the parent.' },
         { title: 'Examples', body: 'Live counters, lists, and accordions built with the framework.' },
     ];
 }

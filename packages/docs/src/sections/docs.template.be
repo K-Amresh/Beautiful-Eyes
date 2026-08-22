@@ -26,6 +26,9 @@
       @else-if(activeSection === 'components'){
         <ComponentsDocs />
       }
+      @else-if(activeSection === 'children'){
+        <ChildrenDocs />
+      }
       @else-if(activeSection === 'templates'){
         <TemplatesDocs />
       }

@@ -1,6 +1,6 @@
 {
   "name": "@beautiful-eyes/reactiveclass",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Beautiful Eyes reactivity -- ReactiveClass, @State, @Effect, @Input.",
   "main": "index.js",
   "files": [
