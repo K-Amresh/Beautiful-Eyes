@@ -47,6 +47,7 @@ jobs:
             @beautiful-eyes/template-compiler
             @beautiful-eyes/dynamic-import
             @beautiful-eyes/core
+            @beautiful-eyes/create
           )
 
           for name in "${packages[@]}"; do

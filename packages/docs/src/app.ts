@@ -2,10 +2,8 @@ import { bootstrap, Component, ReactiveClass, State } from '@beautiful-eyes/core
 import template from './app.template.be';
 import './app.styles.scss';
 import './sections/overview.component';
-import './sections/reactive-class.component';
-import './sections/components.component';
-import './sections/templates.component';
-import './sections/examples.component';
+import './sections/get-started.component';
+import './sections/docs.component';
 import './sections/playground.component';
 import './sections/contributing.component';
 import './sections/sponsor.component';
@@ -21,14 +19,16 @@ class DocsApp extends ReactiveClass {
 
     tabs = [
         { key: 'overview', label: 'Overview' },
-        { key: 'reactive-class', label: 'Reactive Class' },
-        { key: 'components', label: 'Components' },
-        { key: 'templates', label: 'Templates' },
-        { key: 'examples', label: 'Examples' },
+        { key: 'get-started', label: 'Get Started' },
+        { key: 'docs', label: 'Docs' },
         { key: 'playground', label: 'Playground' },
         { key: 'contributing', label: 'Contributing' },
         { key: 'sponsor', label: 'Sponsor' },
     ];
+
+    get isWide(){
+        return this.activeTab === 'docs' || this.activeTab === 'contributing';
+    }
 
     setTab(key: string){
         this.activeTab = key;

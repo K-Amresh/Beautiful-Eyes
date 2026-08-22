@@ -1,7 +1,7 @@
 <img class="hero" src="/Beautiful-eyes.jpg" alt="Beautiful Eyes" />
 
 <h1>{`Beautiful Eyes`}</h1>
-<p class="lede">{`A small reactive UI framework: decorator-based state, a compact HTML-like template language, and a component system, compiled ahead of time into plain DOM code. This docs site is itself built with it.`}</p>
+<p class="lede">{`A small reactive UI framework: decorator-based state, a compact HTML-like template language, and a component system, compiled ahead of time into plain DOM code. This docs site is itself built with it. Open Get Started to scaffold an app.`}</p>
 <p class="overview-links">
   <a class="repo-link" href="https://github.com/AmKreta/Beautiful-Eyes" target="_blank" rel="noopener noreferrer">{`GitHub`}</a>
   <a class="repo-link" href="https://www.npmjs.com/org/beautiful-eyes" target="_blank" rel="noopener noreferrer">{`npm`}</a>

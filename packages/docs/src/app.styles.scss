@@ -806,6 +806,41 @@ td code {
   flex: 1;
 }
 
+.copy-command {
+  position: relative;
+  margin: 0 0 20px;
+}
+
+.copy-command pre {
+  margin: 0;
+  padding-right: 88px;
+}
+
+.copy-command-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  appearance: none;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.copy-command-btn:hover {
+  border-color: var(--accent);
+}
+
+.copy-command-btn.copied {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
 .code-viewer {
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -1018,7 +1053,7 @@ body:has(.contrib-layout),
   padding: 28px 40px 80px;
 }
 
-.contrib-article > h1 {
+.contrib-article h1 {
   margin-top: 0;
 }
 

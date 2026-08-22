@@ -7,21 +7,15 @@
   }
   </nav>
 </header>
-<main class={activeTab === 'contributing' ? 'site-main wide' : 'site-main'}>
+<main class={isWide ? 'site-main wide' : 'site-main'}>
 @if(activeTab === 'overview'){
   <Overview />
 }
-@else-if(activeTab === 'reactive-class'){
-  <ReactiveClassDocs />
+@else-if(activeTab === 'get-started'){
+  <GetStarted />
 }
-@else-if(activeTab === 'components'){
-  <ComponentsDocs />
-}
-@else-if(activeTab === 'templates'){
-  <TemplatesDocs />
-}
-@else-if(activeTab === 'examples'){
-  <Examples />
+@else-if(activeTab === 'docs'){
+  <Docs />
 }
 @else-if(activeTab === 'playground'){
   <Playground />
