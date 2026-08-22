@@ -1,6 +1,6 @@
 {
   "name": "@beautiful-eyes/dynamic-import",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "TypeScript transformer that turns Beautiful Eyes @Component template and style paths into dynamic imports.",
   "main": "dist/index.ts",
   "files": [
