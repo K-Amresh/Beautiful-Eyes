@@ -11,6 +11,7 @@
 
 <p align="center">
   <a href="https://beautiful-eyes.netlify.app/"><img src="https://img.shields.io/badge/docs-live%20site-7c9dff?style=for-the-badge" alt="Documentation"></a>
+  <a href="https://www.npmjs.com/package/@beautiful-eyes/core"><img src="https://img.shields.io/npm/v/@beautiful-eyes/core?style=for-the-badge" alt="npm @beautiful-eyes/core"></a>
   <a href="https://www.linkedin.com/feed/update/urn:li:ugcPost:7247125492263182336/"><img src="https://img.shields.io/badge/Watch%20on-LinkedIn-blue?style=for-the-badge&logo=linkedin" alt="Watch on LinkedIn"></a>
   <a href="https://www.linkedin.com/feed/update/urn:li:ugcPost:7245498239385247745/"><img src="https://img.shields.io/badge/Watch%20on-LinkedIn-blue?style=for-the-badge&logo=linkedin" alt="Watch on LinkedIn"></a>
 </p>
@@ -39,19 +40,21 @@ npm run start:docs    # the documentation site, built with the framework itself
 
 See [`packages/qa/src`](packages/qa/src) for a minimal usage example.
 
+An app typically installs [`@beautiful-eyes/core`](https://www.npmjs.com/package/@beautiful-eyes/core). All scoped packages: [npmjs.com/org/beautiful-eyes](https://www.npmjs.com/org/beautiful-eyes).
+
 ## Project structure
 
 This is an npm-workspaces monorepo. Each package under `packages/` has one job:
 
-| package | what it does |
-|---|---|
-| [`template-compiler`](packages/template-compiler) | Webpack loader that compiles `.template.be` files (lexer → parser → AST → visitor) into a plain JS module. |
-| [`reactiveClass`](packages/reactiveClass) | The reactivity primitives: `ReactiveClass`, `@State`, `@Effect`, `@Computed`, `@Input`. |
-| [`core`](packages/core) | Turns a compiled template into real DOM, wires up reactivity, and implements the component system (`@Component`, props, nesting, `bootstrap()`). |
-| [`lib`](packages/lib) | Shared utilities used across packages -- the `Proxy` machinery, shared types, a task queue. |
-| [`dynamic-import`](packages/dynamic-import) | A TypeScript transformer that rewrites static imports (`import './x'`) into dynamic ones (`import('./x')`). |
-| [`qa`](packages/qa) | A small example app used to exercise the framework end-to-end. |
-| [`docs`](packages/docs) | The documentation site -- itself a Beautiful Eyes app. Deployed via the `netlify.toml` at the repo root. |
+| package | npm | what it does |
+|---|---|---|
+| [`core`](packages/core) | [`@beautiful-eyes/core`](https://www.npmjs.com/package/@beautiful-eyes/core) | Turns a compiled template into real DOM, wires up reactivity, and implements the component system (`@Component`, props, nesting, `bootstrap()`). |
+| [`reactiveClass`](packages/reactiveClass) | [`@beautiful-eyes/reactiveclass`](https://www.npmjs.com/package/@beautiful-eyes/reactiveclass) | The reactivity primitives: `ReactiveClass`, `@State`, `@Effect`, `@Computed`, `@Input`. |
+| [`template-compiler`](packages/template-compiler) | [`@beautiful-eyes/template-compiler`](https://www.npmjs.com/package/@beautiful-eyes/template-compiler) | Webpack loader that compiles `.template.be` files (lexer → parser → AST → visitor) into a plain JS module. |
+| [`lib`](packages/lib) | [`@beautiful-eyes/lib`](https://www.npmjs.com/package/@beautiful-eyes/lib) | Shared utilities used across packages -- the `Proxy` machinery, shared types, a task queue. |
+| [`dynamic-import`](packages/dynamic-import) | [`@beautiful-eyes/dynamic-import`](https://www.npmjs.com/package/@beautiful-eyes/dynamic-import) | A TypeScript transformer that rewrites static imports (`import './x'`) into dynamic ones (`import('./x')`). |
+| [`qa`](packages/qa) | — | A small example app used to exercise the framework end-to-end. |
+| [`docs`](packages/docs) | — | The documentation site -- itself a Beautiful Eyes app. Deployed via the `netlify.toml` at the repo root. |
 
 ## Contributing
 

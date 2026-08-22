@@ -258,6 +258,9 @@ p {
 }
 
 .overview-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   margin: 0 0 28px;
 }
 
@@ -343,6 +346,15 @@ th {
 
 td {
   color: var(--text-dim);
+}
+
+td a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+td a:hover {
+  text-decoration: underline;
 }
 
 td code {

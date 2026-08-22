@@ -17,6 +17,7 @@
     "url": "https://github.com/AmKreta/Beautiful-Eyes",
     "directory": "packages/lib"
   },
+  "homepage": "https://beautiful-eyes.netlify.app/",
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
