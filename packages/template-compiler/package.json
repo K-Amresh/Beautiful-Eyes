@@ -1,11 +1,13 @@
 {
   "name": "@beautiful-eyes/template-compiler",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "description": "Webpack loader that compiles Beautiful Eyes .template.be files into JS modules.",
   "main": "index.js",
   "files": [
     "dist",
     "src",
-    "index.ts"
+    "index.ts",
+    "README.md"
   ],
   "publishConfig": {
     "access": "public"
@@ -24,7 +26,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "@beautiful-eyes/lib":"*"
   }
