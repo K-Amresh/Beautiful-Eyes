@@ -1,11 +1,13 @@
 {
   "name": "@beautiful-eyes/lib",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "description": "Shared utilities for Beautiful Eyes -- Proxify, types, and helpers.",
   "main": "index.js",
   "files": [
     "src",
     "types",
-    "index.ts"
+    "index.ts",
+    "README.md"
   ],
   "publishConfig": {
     "access": "public"
@@ -21,6 +23,5 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "description": ""
+  "license": "ISC"
 }
