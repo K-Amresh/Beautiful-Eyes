@@ -17,6 +17,7 @@
     "type": "git",
     "url": "https://github.com/AmKreta/Beautiful-Eyes"
   },
+  "homepage": "https://beautiful-eyes.netlify.app/",
   "devDependencies": {
     "copy-webpack-plugin": "^12.0.2",
     "css-loader": "^6.8.1",
