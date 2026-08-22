@@ -2,6 +2,14 @@
   "name": "@beautiful-eyes/dynamic-import",
   "version": "1.0.0",
   "main": "dist/index.ts",
+  "files": [
+    "dist",
+    "src",
+    "index.ts"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

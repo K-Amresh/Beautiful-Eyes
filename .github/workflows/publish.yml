@@ -1,0 +1,60 @@
+name: Publish to npm
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Build publishable packages
+        run: |
+          npm run build -w @beautiful-eyes/template-compiler
+          npm run build -w @beautiful-eyes/dynamic-import
+
+      - name: Publish packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          packages=(
+            @beautiful-eyes/lib
+            @beautiful-eyes/reactiveclass
+            @beautiful-eyes/template-compiler
+            @beautiful-eyes/dynamic-import
+            @beautiful-eyes/core
+          )
+
+          for name in "${packages[@]}"; do
+            version="$(npm pkg get version -w "$name" | tr -d '"')"
+            if npm view "$name@$version" version >/dev/null 2>&1; then
+              echo "skip $name@$version (already on npm)"
+              continue
+            fi
+            echo "publish $name@$version"
+            npm publish -w "$name" --access public --provenance
+          done
