@@ -1,5 +1,4 @@
-import { DependencyFn } from "@beautiful-eyes/lib";
-import { BatchedUpdates } from "@beautiful-eyes/lib/src/taskQueue/taskQueue";
+import { BatchedUpdates, DependencyFn } from "@beautiful-eyes/lib";
 
 export type Subscribers = Map<string, Set<string>> | null;
 
