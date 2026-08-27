@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:plugins": "npm run build -w beautiful-eyes",
+    "build:plugins": "npm run build --prefix ../..",
     "start:dev": "npm run build:plugins && webpack serve",
     "build": "npm run build:plugins && webpack build",
     "build:dev": "npm run build"
