@@ -1,8 +1,8 @@
 {
   "name": "@beautiful-eyes/template-compiler",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Webpack loader that compiles Beautiful Eyes .template.be files into JS modules.",
-  "main": "index.js",
+  "main": "dist/index.js",
   "files": [
     "dist",
     "src",

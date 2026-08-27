@@ -7,11 +7,11 @@
     "build": "webpack build --mode production"
   },
   "dependencies": {
-    "@beautiful-eyes/core": "^1.0.3"
+    "@beautiful-eyes/core": "^1.0.4"
   },
   "devDependencies": {
-    "@beautiful-eyes/dynamic-import": "^1.0.3",
-    "@beautiful-eyes/template-compiler": "^1.0.3",
+    "@beautiful-eyes/dynamic-import": "^1.0.4",
+    "@beautiful-eyes/template-compiler": "^1.0.4",
     "css-loader": "^6.8.1",
     "html-webpack-plugin": "^5.5.3",
     "style-loader": "^3.3.3",

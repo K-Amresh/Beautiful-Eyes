@@ -1,9 +1,10 @@
 {
-    "extends":"../../tsconfig.json",
+    "extends": "../../tsconfig.json",
     "compileOnSave": true,
     "compilerOptions": {
+      "noEmit": false,
       "outDir": "dist",
       "module": "CommonJS",
       "target": "ES6"
     }
-  }
+}

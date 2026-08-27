@@ -1,9 +1,11 @@
 {
   "name": "@beautiful-eyes/reactiveclass",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Beautiful Eyes reactivity -- ReactiveClass, @State, @Effect, @Input.",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "index.ts",
   "files": [
+    "dist",
     "src",
     "index.ts",
     "README.md"
@@ -19,12 +21,13 @@
   "homepage": "https://beautiful-eyes.netlify.app/",
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@beautiful-eyes/lib":"*"
+    "@beautiful-eyes/lib": "*"
   }
 }

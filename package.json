@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm run build -w @beautiful-eyes/lib && npm run build -w @beautiful-eyes/reactiveclass && npm run build -w @beautiful-eyes/core && npm run build -w @beautiful-eyes/template-compiler && npm run build -w @beautiful-eyes/dynamic-import",
     "start:qa": "npm run start:dev -w @beautiful-eyes/qa",
     "start:docs": "npm run start:dev -w @beautiful-eyes/docs",
     "build:docs": "npm run build -w @beautiful-eyes/docs"

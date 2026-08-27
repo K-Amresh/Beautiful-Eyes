@@ -31,9 +31,7 @@ jobs:
         run: npm ci
 
       - name: Build publishable packages
-        run: |
-          npm run build -w @beautiful-eyes/template-compiler
-          npm run build -w @beautiful-eyes/dynamic-import
+        run: npm run build
 
       - name: Publish packages
         env:
