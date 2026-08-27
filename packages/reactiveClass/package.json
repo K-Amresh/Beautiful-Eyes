@@ -1,6 +1,6 @@
 {
   "name": "@beautiful-eyes/reactiveclass",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Beautiful Eyes reactivity -- ReactiveClass, @State, @Effect, @Input.",
   "main": "dist/index.js",
   "types": "index.ts",
@@ -27,6 +27,12 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "exports": {
+    ".": {
+      "types": "./index.ts",
+      "default": "./dist/index.js"
+    }
+  },
   "dependencies": {
     "@beautiful-eyes/lib": "*"
   }

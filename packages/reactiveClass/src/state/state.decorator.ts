@@ -1,6 +1,5 @@
-import { Proxify } from "@beautiful-eyes/lib";
+import { Proxify, TaskQueue } from "@beautiful-eyes/lib";
 import { ReactiveClass } from "../reactiveClass/reactiveClass";
-import { TaskQueue } from "@beautiful-eyes/lib/src/taskQueue/taskQueue";
 
 const taskQueue = new TaskQueue();
 
