@@ -1,12 +1,12 @@
 {
   "name": "@beautiful-eyes/core",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Beautiful Eyes runtime -- @Component, View, bootstrap, and reactive decorators.",
-  "main": "index.js",
+  "main": "dist/index.js",
   "types": "index.ts",
   "files": [
+    "dist",
     "src",
-    "index.js",
     "index.ts",
     "README.md"
   ],
@@ -21,7 +21,8 @@
   "homepage": "https://beautiful-eyes.netlify.app/",
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
@@ -29,11 +30,11 @@
   "exports": {
     ".": {
       "types": "./index.ts",
-      "default": "./index.js"
+      "default": "./dist/index.js"
     }
   },
   "dependencies": {
-    "@beautiful-eyes/lib":"*",
-    "@beautiful-eyes/reactiveclass":"*"
+    "@beautiful-eyes/lib": "*",
+    "@beautiful-eyes/reactiveclass": "*"
   }
 }
